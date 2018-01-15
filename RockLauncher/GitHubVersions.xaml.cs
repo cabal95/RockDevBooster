@@ -87,17 +87,29 @@ namespace com.blueboxmoon.RockLauncher
             {
                 DevEnvExecutable = vs.GetExecutable()
             };
-            ReleaseBuilder.StatusTextChanged += Rb_StatusTextChanged;
-            ReleaseBuilder.BuildCompleted += RB_BuildCompleted;
+            ReleaseBuilder.StatusTextChanged += ReleaseBuilder_StatusTextChanged;
+            ReleaseBuilder.ConsoleOutput += ReleaseBuilder_ConsoleOutput;
+            ReleaseBuilder.BuildCompleted += ReleaseBuilder_BuildCompleted;
 
             btnImport.IsEnabled = false;
+            txtConsole.Text = string.Empty;
+
             new Thread( () =>
             {
                 ReleaseBuilder.DownloadRelease( tag.ZipballUrl, "RockBase-" + tag.Name );
             } ).Start();
         }
 
-        private void RB_BuildCompleted( object sender, EventArgs e )
+        private void ReleaseBuilder_ConsoleOutput( object sender, string text )
+        {
+            Dispatcher.Invoke( () =>
+            {
+                txtConsole.AppendText( text );
+                txtConsole.ScrollToEnd();
+            } );
+        }
+
+        private void ReleaseBuilder_BuildCompleted( object sender, EventArgs e )
         {
             Dispatcher.Invoke( () =>
             {
@@ -106,7 +118,7 @@ namespace com.blueboxmoon.RockLauncher
             } );
         }
 
-        private void Rb_StatusTextChanged( object sender, EventArgs e )
+        private void ReleaseBuilder_StatusTextChanged( object sender, EventArgs e )
         {
             Dispatcher.Invoke( () =>
             {

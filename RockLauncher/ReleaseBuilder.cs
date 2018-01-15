@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Xml;
-using System.Xml.Linq;
-using System.Xml.XPath;
+
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 
@@ -19,6 +15,7 @@ namespace com.blueboxmoon.RockLauncher
         public string StatusText { get; private set; }
 
         public event EventHandler BuildCompleted;
+        public event EventHandler<string> ConsoleOutput;
 
         public string DevEnvExecutable { get; set; }
 
@@ -38,11 +35,7 @@ namespace com.blueboxmoon.RockLauncher
             TemplateName = template;
             string filename = Path.Combine( Support.GetDataPath(), "temp.zip" );
 
-            if ( false )
-            {
-                UnpackRelease( filename );
-                return;
-            }
+            UpdateStatusText( "Downloading..." );
 
             var webClient = new WebClient();
 
@@ -79,19 +72,16 @@ namespace com.blueboxmoon.RockLauncher
 
             UpdateStatusText( "Building..." );
 
-            var process = new System.Diagnostics.Process();
-            var startInfo = new System.Diagnostics.ProcessStartInfo
+            var process = new ConsoleAppManager( DevEnvExecutable );
+            process.StandartTextReceived += Console_StandartTextReceived;
+            process.WorkingDirectory = Support.GetBuildPath();
+            process.ExecuteAsync( "Rock.sln", "/Build" );
+
+            while ( process.Running )
             {
-                WindowStyle = System.Diagnostics.ProcessWindowStyle.Minimized,
-                FileName = DevEnvExecutable,
-                Arguments = "Rock.sln /Build",
-                WorkingDirectory = Support.GetBuildPath()
-            };
-            process.StartInfo = startInfo;
+                Thread.Sleep( 100 );
+            }
 
-            process.Start();
-
-            process.WaitForExit();
             if ( process.ExitCode != 0 )
             {
                 UpdateStatusText( "Build Failed." );
@@ -116,7 +106,7 @@ namespace com.blueboxmoon.RockLauncher
 
             Directory.Delete( Support.GetBuildPath(), true );
             string tempfilename = Path.Combine( Support.GetDataPath(), "temp.zip" );
-            File.Delete( tempfilename );
+            //File.Delete( tempfilename );
 
             UpdateStatusText( "Template has been created." );
 
@@ -147,19 +137,18 @@ namespace com.blueboxmoon.RockLauncher
 
         private bool NuGetRestore()
         {
-            var process = new System.Diagnostics.Process();
-            var startInfo = new System.Diagnostics.ProcessStartInfo
+            var process = new ConsoleAppManager( Path.Combine( Environment.CurrentDirectory, "nuget.exe" ) )
             {
-                WindowStyle = System.Diagnostics.ProcessWindowStyle.Minimized,
-                FileName = Path.Combine( Environment.CurrentDirectory, "nuget.exe" ),
-                Arguments = "restore",
                 WorkingDirectory = Support.GetBuildPath()
             };
-            process.StartInfo = startInfo;
+            process.StandartTextReceived += Console_StandartTextReceived;
+            process.ExecuteAsync( "restore" );
 
-            process.Start();
+            while (process.Running)
+            {
+                Thread.Sleep( 100 );
+            }
 
-            process.WaitForExit();
             if ( process.ExitCode != 0 )
             {
                 UpdateStatusText( "NuGet Restore Failed." );
@@ -167,6 +156,11 @@ namespace com.blueboxmoon.RockLauncher
             }
 
             return true;
+        }
+
+        private void Console_StandartTextReceived( object sender, string text )
+        {
+            ConsoleOutput?.Invoke( this, text );
         }
 
         public void ExtractZipFile( string archiveFilenameIn, string outFolder )

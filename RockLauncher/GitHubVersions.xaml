@@ -39,7 +39,22 @@
                 Width="80"
                 Click="btnImport_Click"
                 Style="{StaticResource buttonStyleIconAction}"/>
-        <TextBlock Name="txtStatus" Margin="10,105,10,10" TextWrapping="Wrap" Text="Status" TextAlignment="Center"/>
 
+        <TextBlock Name="txtStatus"
+                   Margin="0,105,0,0"
+                   TextWrapping="Wrap"
+                   Text="Status"
+                   TextAlignment="Center" Height="16" VerticalAlignment="Top"/>
+
+        <TextBox Name="txtConsole"
+                 Margin="0,126,0,0"
+                 TextWrapping="NoWrap"
+                 HorizontalScrollBarVisibility="Visible"
+                 VerticalScrollBarVisibility="Visible"
+                 Text="{Binding Text, Mode=OneWay}"
+                 FontFamily="Consolas"
+                 BorderThickness="1"
+                 IsReadOnly="True"
+                 />
     </Grid>
 </UserControl>

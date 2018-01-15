@@ -193,11 +193,12 @@ namespace com.blueboxmoon.RockLauncher
             Process.Start( e.Uri.AbsoluteUri );
         }
 
-        private void IisExpressProcess_StandartTextReceived( object sender, string e )
+        private void IisExpressProcess_StandartTextReceived( object sender, string text )
         {
             Dispatcher.Invoke( () =>
              {
-                 txtConsole.Text += e;
+                 txtConsole.AppendText( text );
+                 txtConsole.ScrollToEnd();
              } );
         }
 

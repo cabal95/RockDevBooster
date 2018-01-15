@@ -47,6 +47,18 @@ public class ConsoleAppManager
         get; private set;
     }
 
+    public string WorkingDirectory
+    {
+        get
+        {
+            return this.process.StartInfo.WorkingDirectory;
+        }
+        set
+        {
+            this.process.StartInfo.WorkingDirectory = value;
+        }
+    }
+
     public void ExecuteAsync( params string[] args )
     {
         if ( this.Running )
