@@ -5,21 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:com.blueboxmoon.RockLauncher"
         mc:Ignorable="d"
-        Title="Rock Launcher" Height="350" Width="525">
+        Title="Rock Launcher"
+        Height="350"
+        Width="525"
+        MinHeight="300"
+        MinWidth="400"
+        Background="#dbd5cb">
     <Grid>
-        <TabControl>
+        <TabControl Background="#dbd5cb">
             <TabItem Header="Instances">
-                <Grid Background="#FFE5E5E5">
-                    <local:InstancesView Grid.ColumnSpan="3"/>
+                <Grid Background="#dbd5cb">
+                    <local:InstancesView />
                 </Grid>
             </TabItem>
             <TabItem Header="GitHub Versions">
-                <Grid Background="#FFE5E5E5">
+                <Grid Background="#dbd5cb">
                     <local:GitHubVersions />
                 </Grid>
             </TabItem>
             <TabItem Header="Templates">
-                <Grid Background="#FFE5E5E5">
+                <Grid Background="#dbd5cb">
                     <local:TemplatesView/>
                 </Grid>
             </TabItem>

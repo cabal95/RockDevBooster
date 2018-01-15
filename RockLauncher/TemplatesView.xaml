@@ -7,12 +7,57 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <ComboBox Name="cbTemplates" Margin="64,10,10,0" VerticalAlignment="Top" SelectionChanged="ComboBox_SelectionChanged"/>
-        <TextBlock HorizontalAlignment="Left" Margin="10,13,0,0" TextWrapping="Wrap" Text="Template" VerticalAlignment="Top"/>
-        <Button Name="btnDeploy" Content="Deploy" Margin="64,65,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="75" Click="btnDeploy_Click" />
-        <Button Name="btnDelete" Content="Delete" HorizontalAlignment="Left" Margin="215,65,0,0" VerticalAlignment="Top" Width="75" Click="btnDelete_Click" />
-        <TextBlock Name="txtStatus" Margin="10,90,10,10" TextWrapping="Wrap" Text="TextBlock"/>
-        <TextBlock HorizontalAlignment="Left" Margin="10,40,0,0" TextWrapping="Wrap" Text="Name" VerticalAlignment="Top"/>
-        <TextBox Name="txtName" Height="23" Margin="64,37,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" />
+        <Label
+            HorizontalAlignment="Left"
+            Margin="0,10,0,0"
+            Content="Template"
+            VerticalAlignment="Top"
+            Style="{StaticResource labelStyleBold}" Width="70"
+            />
+        <ComboBox Name="cbTemplates"
+                  Margin="75,10,10,0"
+                  VerticalAlignment="Top"
+                  SelectionChanged="ComboBox_SelectionChanged"
+                  />
+
+        <Label
+            HorizontalAlignment="Left"
+            Margin="0,40,0,0"
+            Content="Name"
+            VerticalAlignment="Top"
+            Width="70"
+            Style="{StaticResource labelStyleBold}"
+            />
+        <TextBox Name="txtName"
+                 Height="23"
+                 Margin="75,37,10,0"
+                 TextWrapping="Wrap"
+                 Text=""
+                 VerticalAlignment="Top"
+                 Style="{StaticResource textboxStyle}"
+                 Width="Auto"
+                 HorizontalAlignment="Stretch"
+                 />
+
+        <Button Name="btnDeploy"
+                Content="&#xF0EE; Deploy"
+                Margin="75,65,0,0"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Left"
+                Width="80"
+                Click="btnDeploy_Click"
+                Style="{StaticResource buttonStyleIconSuccess}"
+                />
+        <Button Name="btnDelete"
+                Content="&#xF00D; Delete"
+                Margin="0,65,10,0"
+                VerticalAlignment="Top"
+                Width="75"
+                Click="btnDelete_Click"
+                HorizontalAlignment="Right"
+                Style="{StaticResource buttonStyleIconDanger}"
+                />
+
+        <TextBlock Name="txtStatus" Margin="10,106,10,10" TextWrapping="Wrap" Text="TextBlock"/>
     </Grid>
 </UserControl>

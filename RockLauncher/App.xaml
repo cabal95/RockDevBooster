@@ -5,6 +5,65 @@
              StartupUri="MainWindow.xaml"
              DispatcherUnhandledException="Application_Exception">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Rock.Wpf;component/StyleResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Button Style: Icon-->
+            <Style x:Key="buttonStyleIcon"
+                   BasedOn="{StaticResource buttonStyle}"
+                   TargetType="{x:Type Button}">
+                <Setter Property="FontFamily" Value="./resources/#FontAwesome" />
+                <Setter Property="Width" Value="36" />
+                <Setter Property="FontSize" Value="12" />
+            </Style>
+
+            <!-- Button Style: Icon Success -->
+            <Style x:Key="buttonStyleIconSuccess"
+                   BasedOn="{StaticResource buttonStyleIcon}"
+                   TargetType="{x:Type Button}">
+                <Setter Property="Foreground" Value="#fff" />
+                <Setter Property="Background" Value="#5c9e7d" />
+                <Setter Property="BorderBrush" Value="#538e70" />
+            </Style>
+
+            <!-- Button Style: Mini Icon Success -->
+            <Style x:Key="buttonStyleMiniIconSuccess"
+                   BasedOn="{StaticResource buttonStyleMiniIcon}"
+                   TargetType="{x:Type Button}">
+                <Setter Property="Foreground" Value="#fff" />
+                <Setter Property="Background" Value="#5c9e7d" />
+                <Setter Property="BorderBrush" Value="#538e70" />
+            </Style>
+
+            <!-- Button Style: Icon Action -->
+            <Style x:Key="buttonStyleIconAction"
+                   BasedOn="{StaticResource buttonStyleIcon}"
+                   TargetType="{x:Type Button}">
+                <Setter Property="Foreground" Value="#fff" />
+                <Setter Property="Background" Value="#466673" />
+                <Setter Property="BorderBrush" Value="#365663" />
+            </Style>
+
+            <!-- Button Style: Mini Icon Action -->
+            <Style x:Key="buttonStyleMiniIconAction"
+                   BasedOn="{StaticResource buttonStyleMiniIcon}"
+                   TargetType="{x:Type Button}">
+                <Setter Property="Foreground" Value="#fff" />
+                <Setter Property="Background" Value="#466673" />
+                <Setter Property="BorderBrush" Value="#365663" />
+            </Style>
+
+            <!-- Button Style: Icon Danger -->
+            <Style x:Key="buttonStyleIconDanger"
+                   BasedOn="{StaticResource buttonStyleIcon}"
+                   TargetType="{x:Type Button}">
+                <Setter Property="Foreground" Value="#fff" />
+                <Setter Property="Background" Value="#ac3434" />
+                <Setter Property="BorderBrush" Value="#902c2c" />
+            </Style>
+
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

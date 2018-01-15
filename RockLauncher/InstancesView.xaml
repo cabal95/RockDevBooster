@@ -5,16 +5,83 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:com.blueboxmoon.RockLauncher"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" MinWidth="300">
+             d:DesignHeight="300"
+             d:DesignWidth="350"
+             MinWidth="350">
     <Grid>
-        <TextBlock HorizontalAlignment="Left" Margin="10,13,0,0" TextWrapping="Wrap" Text="Instance" VerticalAlignment="Top" Width="57"/>
-        <ComboBox Name="cbInstances" Margin="72,10,10,0" VerticalAlignment="Top" SelectionChanged="cbInstances_SelectionChanged"/>
-        <TextBlock HorizontalAlignment="Left" Margin="10,39,0,0" TextWrapping="Wrap" Text="Port" VerticalAlignment="Top" Width="57"/>
-        <TextBox Name="txtPort" Height="23" Margin="72,37,10,0" TextWrapping="Wrap" Text="6229" VerticalAlignment="Top" PreviewTextInput="txtPort_PreviewTextInput" />
-        <Button Name="btnStart" Content="Start" Margin="72,65,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="65" Click="btnStart_Click"/>
-        <Button Name="btnStop" Content="Stop" Margin="142,65,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="65" Click="btnStop_Click"/>
-        <Button Name="btnDelete" Content="Delete" Margin="0,65,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="65" Click="btnDelete_Click"/>
-        <TextBlock Name="txtStatus" Margin="10,90,10,0" TextWrapping="NoWrap" TextAlignment="Center" Text="Status" VerticalAlignment="Top"/>
-        <TextBox Name="txtConsole" Margin="0,111,0,0" TextWrapping="NoWrap" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" Text="{Binding Text, Mode=OneWay}" FontFamily="Consolas" BorderThickness="1" IsReadOnly="True" />
+        <Label
+            HorizontalAlignment="Left"
+            Margin="0,10,0,0"
+            Content="Instance"
+            VerticalAlignment="Top"
+            Width="67"
+            Style="{StaticResource labelStyleBold}"
+            />
+        <ComboBox Name="cbInstances"
+                  Margin="72,10,10,0"
+                  VerticalAlignment="Top"
+                  SelectionChanged="cbInstances_SelectionChanged"
+                  />
+
+        <Label HorizontalAlignment="Left"
+               Margin="0,39,0,0"
+               Content="Port"
+               VerticalAlignment="Top"
+               Width="67"
+               Style="{StaticResource labelStyleBold}"
+               />
+        <TextBox Name="txtPort"
+                 Height="23"
+                 Margin="72,37,10,0"
+                 TextWrapping="Wrap"
+                 Text="6229"
+                 VerticalAlignment="Top"
+                 PreviewTextInput="txtPort_PreviewTextInput"
+                 Style="{StaticResource textboxStyle}" Width="Auto" HorizontalAlignment="Stretch"/>
+
+        <Button Name="btnStart"
+                Content="&#xF04B; Start"
+                Margin="72,65,0,0"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Left"
+                Width="65"
+                Click="btnStart_Click"
+                Style="{StaticResource buttonStyleIconSuccess}"
+                />
+        <Button Name="btnStop"
+                Content="&#xF04D; Stop"
+                Margin="142,65,0,0"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Left"
+                Width="65"
+                Click="btnStop_Click"
+                Style="{StaticResource buttonStyleIconAction}"
+                />
+        <Button Name="btnDelete"
+                Content="&#xF00D; Delete"
+                Margin="0,65,10,0"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Right"
+                Width="73"
+                Click="btnDelete_Click"
+                Style="{StaticResource buttonStyleIconDanger}"/>
+        
+        <TextBlock Name="txtStatus"
+                   Margin="0,106,0,0"
+                   Text="Instance"
+                   TextAlignment="Center"
+                   VerticalAlignment="Top"
+                   />
+        
+        <TextBox Name="txtConsole"
+                 Margin="0,127,0,0"
+                 TextWrapping="NoWrap"
+                 HorizontalScrollBarVisibility="Visible"
+                 VerticalScrollBarVisibility="Visible"
+                 Text="{Binding Text, Mode=OneWay}"
+                 FontFamily="Consolas"
+                 BorderThickness="1"
+                 IsReadOnly="True"
+                 />
     </Grid>
 </UserControl>
