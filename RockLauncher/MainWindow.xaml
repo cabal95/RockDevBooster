@@ -1,0 +1,28 @@
+﻿<Window x:Class="com.blueboxmoon.RockLauncher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:com.blueboxmoon.RockLauncher"
+        mc:Ignorable="d"
+        Title="Rock Launcher" Height="350" Width="525">
+    <Grid>
+        <TabControl>
+            <TabItem Header="Instances">
+                <Grid Background="#FFE5E5E5">
+                    <local:InstancesView Grid.ColumnSpan="3"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="GitHub Versions">
+                <Grid Background="#FFE5E5E5">
+                    <local:GitHubVersions />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Templates">
+                <Grid Background="#FFE5E5E5">
+                    <local:TemplatesView/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

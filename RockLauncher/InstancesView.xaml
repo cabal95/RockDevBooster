@@ -1,0 +1,20 @@
+﻿<UserControl x:Class="com.blueboxmoon.RockLauncher.InstancesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:com.blueboxmoon.RockLauncher"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" MinWidth="300">
+    <Grid>
+        <TextBlock HorizontalAlignment="Left" Margin="10,13,0,0" TextWrapping="Wrap" Text="Instance" VerticalAlignment="Top" Width="57"/>
+        <ComboBox Name="cbInstances" Margin="72,10,10,0" VerticalAlignment="Top" SelectionChanged="cbInstances_SelectionChanged"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,39,0,0" TextWrapping="Wrap" Text="Port" VerticalAlignment="Top" Width="57"/>
+        <TextBox Name="txtPort" Height="23" Margin="72,37,10,0" TextWrapping="Wrap" Text="6229" VerticalAlignment="Top" PreviewTextInput="txtPort_PreviewTextInput" />
+        <Button Name="btnStart" Content="Start" Margin="72,65,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="65" Click="btnStart_Click"/>
+        <Button Name="btnStop" Content="Stop" Margin="142,65,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="65" Click="btnStop_Click"/>
+        <Button Name="btnDelete" Content="Delete" Margin="0,65,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="65" Click="btnDelete_Click"/>
+        <TextBlock Name="txtStatus" Margin="10,90,10,0" TextWrapping="NoWrap" TextAlignment="Center" Text="Status" VerticalAlignment="Top"/>
+        <TextBox Name="txtConsole" Margin="0,111,0,0" TextWrapping="NoWrap" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" Text="{Binding Text, Mode=OneWay}" FontFamily="Consolas" BorderThickness="1" IsReadOnly="True" />
+    </Grid>
+</UserControl>
