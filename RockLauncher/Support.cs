@@ -1,9 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Core;
@@ -11,22 +8,34 @@ using Microsoft.VisualStudio.Setup.Configuration;
 
 namespace com.blueboxmoon.RockLauncher
 {
+    /// <summary>
+    /// Provides various helper methods used by the RockLauncher application.
+    /// </summary>
     static class Support
     {
+        /// <summary>
+        /// Get a list of all the visual studio instances installed on the system.
+        /// </summary>
+        /// <returns>A collection of VisualStudioInstall objects.</returns>
         static public List<VisualStudioInstall> GetVisualStudioInstances()
         {
             try
             {
+                //
+                // Read the first 10 VS install locations. Safe assumption they have less than 10.
+                //
                 var e = new SetupConfiguration().EnumInstances();
-
-                int fetched;
                 var instances = new ISetupInstance[10];
-                e.Next( 10, instances, out fetched );
+                e.Next( 10, instances, out int fetched );
 
                 var vsList = new List<VisualStudioInstall>();
                 for ( int i = 0; i < fetched; i++ )
                 {
-                    vsList.Add( new VisualStudioInstall { Name = instances[i].GetDisplayName(), Path = instances[i].GetInstallationPath() } );
+                    vsList.Add( new VisualStudioInstall
+                    {
+                        Name = instances[i].GetDisplayName(),
+                        Path = instances[i].GetInstallationPath()
+                    } );
                 }
 
                 return vsList;
@@ -37,6 +46,10 @@ namespace com.blueboxmoon.RockLauncher
             }
         }
 
+        /// <summary>
+        /// Get the filesystem path to the RockLauncher data folder.
+        /// </summary>
+        /// <returns>A string representing a location on the filesystem.</returns>
         static public string GetDataPath()
         {
             string appDataPath = Environment.GetEnvironmentVariable( "LocalAppData" );
@@ -50,6 +63,10 @@ namespace com.blueboxmoon.RockLauncher
             return dataPath;
         }
 
+        /// <summary>
+        /// Get the path to the temporary build directory.
+        /// </summary>
+        /// <returns>A string representing a location on the filesystem.</returns>
         static public string GetBuildPath()
         {
             string dataPath = GetDataPath();
@@ -63,6 +80,10 @@ namespace com.blueboxmoon.RockLauncher
             return buildPath;
         }
 
+        /// <summary>
+        /// Get the path to the Templates directory.
+        /// </summary>
+        /// <returns>A string representing a location on the filesystem.</returns>
         static public string GetTemplatesPath()
         {
             string dataPath = GetDataPath();
@@ -76,6 +97,10 @@ namespace com.blueboxmoon.RockLauncher
             return templatesPath;
         }
 
+        /// <summary>
+        /// Get the path to the RockWeb instances.
+        /// </summary>
+        /// <returns>A string representing a location on the filesystem.</returns>
         static public string GetInstancesPath()
         {
             string dataPath = GetDataPath();
@@ -89,6 +114,12 @@ namespace com.blueboxmoon.RockLauncher
             return instancesPath;
         }
 
+        /// <summary>
+        /// Extract a ZIP archive onto the filesystem.
+        /// </summary>
+        /// <param name="archiveFilenameIn">The path to the ZIP file on disk.</param>
+        /// <param name="outFolder">The directory to extract the files into.</param>
+        /// <param name="progressCallback">An optional callback that is passed the percentage progress of the operation.</param>
         static public void ExtractZipFile( string archiveFilenameIn, string outFolder, Action<double> progressCallback )
         {
             ZipFile zf = null;
@@ -100,20 +131,26 @@ namespace com.blueboxmoon.RockLauncher
                 int count = 0;
                 foreach ( ZipEntry zipEntry in zf )
                 {
+                    //
+                    // Process the progress callback.
+                    //
                     count += 1;
                     if ( count % 10 == 0 )
                     {
                         progressCallback?.Invoke( count / ( double ) zf.Count );
                     }
 
+                    //
+                    // We only need to process files.
+                    //
                     if ( !zipEntry.IsFile )
                     {
                         continue;
                     }
 
-                    byte[] buffer = new byte[4096];
-                    Stream zipStream = zf.GetInputStream( zipEntry );
-
+                    //
+                    // Get the full on-disk path to the file and create the directory if needed.
+                    //
                     String fullZipToPath = Path.Combine( outFolder, zipEntry.Name );
                     string directoryName = Path.GetDirectoryName( fullZipToPath );
                     if ( directoryName.Length > 0 )
@@ -121,6 +158,11 @@ namespace com.blueboxmoon.RockLauncher
                         Directory.CreateDirectory( directoryName );
                     }
 
+                    //
+                    // Read the compressed data and write the uncompressed data to disk.
+                    //
+                    byte[] buffer = new byte[4096];
+                    Stream zipStream = zf.GetInputStream( zipEntry );
                     using ( FileStream streamWriter = File.Create( fullZipToPath ) )
                     {
                         StreamUtils.Copy( zipStream, streamWriter, buffer );
@@ -137,6 +179,11 @@ namespace com.blueboxmoon.RockLauncher
             }
         }
 
+        /// <summary>
+        /// Create a new ZIP file from the contents of a directory on disk.
+        /// </summary>
+        /// <param name="outPathname">The full path to the new ZIP file.</param>
+        /// <param name="folderName">The directory to be compressed.</param>
         static public void CreateZipFromFolder( string outPathname, string folderName )
         {
             FileStream fsOut = File.Create( outPathname );
@@ -153,14 +200,24 @@ namespace com.blueboxmoon.RockLauncher
             zipStream.Close();
         }
 
+        /// <summary>
+        /// Recursively called function to compress a directory and all it's contents.
+        /// </summary>
+        /// <param name="path">The path of the directory to compress.</param>
+        /// <param name="zipStream">The Zip Stream to write the compressed files to.</param>
+        /// <param name="folderOffset">How much of the path to strip when compressing files.</param>
         static private void CompressFolder( string path, ZipOutputStream zipStream, int folderOffset )
         {
-            string[] files = Directory.GetFiles( path );
-
-            foreach ( string filename in files )
+            //
+            // Process each file in the directory.
+            //
+            foreach ( string filename in Directory.GetFiles( path ) )
             {
                 FileInfo fi = new FileInfo( filename );
 
+                //
+                // Get the relative filename and set the file information.
+                //
                 string entryName = filename.Substring( folderOffset );
                 entryName = ZipEntry.CleanName( entryName );
                 ZipEntry newEntry = new ZipEntry( entryName )
@@ -169,9 +226,11 @@ namespace com.blueboxmoon.RockLauncher
                     Size = fi.Length
                 };
 
-                zipStream.PutNextEntry( newEntry );
-
+                //
+                // Store the file in the archive.
+                //
                 byte[] buffer = new byte[4096];
+                zipStream.PutNextEntry( newEntry );
                 using ( FileStream streamReader = File.OpenRead( filename ) )
                 {
                     StreamUtils.Copy( streamReader, zipStream, buffer );
@@ -179,51 +238,13 @@ namespace com.blueboxmoon.RockLauncher
                 zipStream.CloseEntry();
             }
 
-            string[] folders = Directory.GetDirectories( path );
-            foreach ( string folder in folders )
+            //
+            // Process each sub-directory recursively.
+            //
+            foreach ( string folder in Directory.GetDirectories( path ) )
             {
                 CompressFolder( folder, zipStream, folderOffset );
             }
-        }
-
-    }
-
-    public class VisualStudioInstall
-    {
-        public string Name { get; set; }
-
-        public string Path { get; set; }
-
-        public string GetExecutable()
-        {
-            return FindExecutable( Path );
-        }
-
-        private string FindExecutable( string path )
-        {
-            string devenv = System.IO.Path.Combine( path, "devenv.com" );
-
-            if ( File.Exists( devenv ) )
-            {
-                return devenv;
-            }
-
-            var dirs = Directory.GetDirectories( path );
-            foreach ( var dir in dirs )
-            {
-                devenv = FindExecutable( dir );
-                if ( devenv != null )
-                {
-                    return devenv;
-                }
-            }
-
-            return null;
-        }
-
-        public override string ToString()
-        {
-            return Name;
         }
     }
 }

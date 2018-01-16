@@ -11,28 +11,58 @@ namespace com.blueboxmoon.RockLauncher
 {
     public class ReleaseBuilder
     {
-        public event EventHandler StatusTextChanged;
-        public string StatusText { get; private set; }
+        #region Internal Fields
 
-        public event EventHandler BuildCompleted;
-        public event EventHandler<string> ConsoleOutput;
+        /// <summary>
+        /// The status text that we last knew. We track this so we don't send duplicate
+        /// status updates.
+        /// </summary>
+        protected string StatusText { get; private set; }
 
-        public string DevEnvExecutable { get; set; }
-
+        /// <summary>
+        /// The name of the template to deploy this build as.
+        /// </summary>
         protected string TemplateName { get; set; }
 
-        private void UpdateStatusText( string text )
-        {
-            if ( StatusText != text )
-            {
-                StatusText = text;
-                StatusTextChanged?.Invoke( this, new EventArgs() );
-            }
-        }
+        /// <summary>
+        /// The devenv.com executable to use when building this release.
+        /// </summary>
+        protected string DevEnvExecutable { get; set; }
 
-        public void DownloadRelease( string url, string template )
+        #endregion
+
+        #region Public Properties
+
+        /// <summary>
+        /// Notification that the single-line status text has changed.
+        /// </summary>
+        public event EventHandler<string> StatusTextChanged;
+
+        /// <summary>
+        /// Notification that the stdout has new text to be displayed.
+        /// </summary>
+        public event EventHandler<string> ConsoleOutput;
+
+        /// <summary>
+        /// Notification that the build has completed.
+        /// </summary>
+        public event EventHandler BuildCompleted;
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Download the tag-release from the GitHub URL and build it.
+        /// </summary>
+        /// <param name="url">The URL that contains the Zip archive of the release.</param>
+        /// <param name="devenv">The Visual Studio executable to use when building.</param>
+        /// <param name="template">What to name the template after it has been built.</param>
+        public void DownloadRelease( string url, string devenv, string template )
         {
             TemplateName = template;
+            DevEnvExecutable = devenv;
+
             string filename = Path.Combine( Support.GetDataPath(), "temp.zip" );
 
             UpdateStatusText( "Downloading..." );
@@ -45,6 +75,27 @@ namespace com.blueboxmoon.RockLauncher
             webClient.DownloadFileAsync( new Uri( url ), filename );
         }
 
+        #endregion
+
+        #region Internal Methods
+
+        /// <summary>
+        /// Update the status text and notify the callback method.
+        /// </summary>
+        /// <param name="text">The new status text.</param>
+        private void UpdateStatusText( string text )
+        {
+            if ( StatusText != text )
+            {
+                StatusText = text;
+                StatusTextChanged?.Invoke( this, text );
+            }
+        }
+
+        /// <summary>
+        /// Unpack the ZIP file into the Build directory.
+        /// </summary>
+        /// <param name="filename">The full path to the ZIP file.</param>
         private void UnpackRelease( string filename )
         {
             UpdateStatusText( "Unpacking..." );
@@ -55,33 +106,51 @@ namespace com.blueboxmoon.RockLauncher
             BuildRelease();
         }
 
+        /// <summary>
+        /// Build the release so we have compiled DLLs.
+        /// </summary>
         private void BuildRelease()
         {
+            //
+            // Restore any NuGet packages.
+            //
             UpdateStatusText( "Restoring References" );
-
             if ( !NuGetRestore() )
             {
                 BuildCompleted?.Invoke( this, new EventArgs() );
                 return;
             }
 
+            //
+            // For some reason, MSBuild fails completely and the devenv build method
+            // does not copy indirect DLL references (e.g. the NuGet DLLs) into the
+            // RockWeb folder, so we need to do that manually.
+            //
             foreach ( var d in Directory.EnumerateDirectories( Support.GetBuildPath() ) )
             {
                 CopyProjectReferences( d );
             }
 
+            //
+            // Launch a new devenv.com process to build the solution.
+            //
             UpdateStatusText( "Building..." );
-
-            var process = new ConsoleAppManager( DevEnvExecutable );
-            process.StandartTextReceived += Console_StandartTextReceived;
+            var process = new ConsoleApp( DevEnvExecutable );
+            process.StandardTextReceived += Console_StandardTextReceived;
             process.WorkingDirectory = Support.GetBuildPath();
             process.ExecuteAsync( "Rock.sln", "/Build" );
 
+            //
+            // Wait for it to complete.
+            //
             while ( process.Running )
             {
                 Thread.Sleep( 100 );
             }
 
+            //
+            // Check if our build worked or not.
+            //
             if ( process.ExitCode != 0 )
             {
                 UpdateStatusText( "Build Failed." );
@@ -89,21 +158,26 @@ namespace com.blueboxmoon.RockLauncher
                 return;
             }
 
-            UpdateStatusText( "Build Succeeded" );
-
             BuildTemplate();
         }
 
-        protected void BuildTemplate()
+        /// <summary>
+        /// Compress the RockWeb folder into a ZIP file as a template. Then do final cleanup.
+        /// </summary>
+        private void BuildTemplate()
         {
+            //
+            // Compress the RockWeb folder into a template ZIP file.
+            //
             UpdateStatusText( "Compressing RockWeb..." );
-
             var zipFile = Path.Combine( Support.GetTemplatesPath(), TemplateName + ".zip" );
             var rockWeb = Path.Combine( Support.GetBuildPath(), "RockWeb" );
             Support.CreateZipFromFolder( zipFile, rockWeb );
 
+            //
+            // Cleanup temporary files.
+            //
             UpdateStatusText( "Cleaning up..." );
-
             Directory.Delete( Support.GetBuildPath(), true );
             string tempfilename = Path.Combine( Support.GetDataPath(), "temp.zip" );
             //File.Delete( tempfilename );
@@ -113,42 +187,33 @@ namespace com.blueboxmoon.RockLauncher
             BuildCompleted?.Invoke( this, new EventArgs() );
         }
 
-        private void CopyProjectReferences( string projectDirectory )
-        {
-            string destPath = Path.Combine( Path.Combine( Support.GetBuildPath(), "RockWeb" ), "Bin" );
-
-            foreach ( var proj in Directory.EnumerateFiles( Path.Combine( Support.GetBuildPath(), projectDirectory ), "*.csproj" ) )
-            {
-                var doc = new XmlDocument();
-                doc.Load( proj );
-                var mgr = new XmlNamespaceManager( doc.NameTable );
-                mgr.AddNamespace( "df", doc.DocumentElement.NamespaceURI );
-                foreach ( XmlNode node in doc.DocumentElement.SelectNodes( "//df:HintPath", mgr ) )
-                {
-                    string dllFile = Path.Combine( Path.GetDirectoryName( proj ), node.InnerText );
-                    string destFile = Path.Combine( destPath, Path.GetFileName( node.InnerText ) );
-                    if ( File.Exists( dllFile ) && !File.Exists( destFile ) )
-                    {
-                        File.Copy( dllFile, Path.Combine( destPath, Path.GetFileName( node.InnerText ) ) );
-                    }
-                }
-            }
-        }
-
+        /// <summary>
+        /// Execute NuGet to restore all package references.
+        /// </summary>
+        /// <returns>True if the operation succeeded.</returns>
         private bool NuGetRestore()
         {
-            var process = new ConsoleAppManager( Path.Combine( Environment.CurrentDirectory, "nuget.exe" ) )
+            //
+            // Execute 'nuget.exe restore' in the solution directory.
+            //
+            var process = new ConsoleApp( Path.Combine( Environment.CurrentDirectory, "nuget.exe" ) )
             {
                 WorkingDirectory = Support.GetBuildPath()
             };
-            process.StandartTextReceived += Console_StandartTextReceived;
+            process.StandardTextReceived += Console_StandardTextReceived;
             process.ExecuteAsync( "restore" );
 
+            //
+            // Wait for it to finish.
+            //
             while (process.Running)
             {
                 Thread.Sleep( 100 );
             }
 
+            //
+            // Make sure it worked.
+            //
             if ( process.ExitCode != 0 )
             {
                 UpdateStatusText( "NuGet Restore Failed." );
@@ -158,12 +223,54 @@ namespace com.blueboxmoon.RockLauncher
             return true;
         }
 
-        private void Console_StandartTextReceived( object sender, string text )
+        /// <summary>
+        /// Copy all referenced DLL files from the project directory into the RockWeb/bin directory.
+        /// We do this by scanning each csproj file in the directory and looking for HintPath nodes.
+        /// </summary>
+        /// <param name="projectDirectory">The project directory to scan.</param>
+        private void CopyProjectReferences( string projectDirectory )
         {
-            ConsoleOutput?.Invoke( this, text );
+            string destPath = Path.Combine( Path.Combine( Support.GetBuildPath(), "RockWeb" ), "Bin" );
+
+            foreach ( var proj in Directory.EnumerateFiles( Path.Combine( Support.GetBuildPath(), projectDirectory ), "*.csproj" ) )
+            {
+                //
+                // Load the csproj file.
+                //
+                var doc = new XmlDocument();
+                doc.Load( proj );
+                var mgr = new XmlNamespaceManager( doc.NameTable );
+                mgr.AddNamespace( "df", doc.DocumentElement.NamespaceURI );
+
+                //
+                // Find and process all HintPath nodes.
+                //
+                foreach ( XmlNode node in doc.DocumentElement.SelectNodes( "//df:HintPath", mgr ) )
+                {
+                    string dllFile = Path.Combine( Path.GetDirectoryName( proj ), node.InnerText );
+                    string destFile = Path.Combine( destPath, Path.GetFileName( node.InnerText ) );
+
+                    //
+                    // If we found a DLL in the project directory that does not exist in the RockWeb directory
+                    // then copy it over.
+                    //
+                    if ( File.Exists( dllFile ) && !File.Exists( destFile ) )
+                    {
+                        File.Copy( dllFile, Path.Combine( destPath, Path.GetFileName( node.InnerText ) ) );
+                    }
+                }
+            }
         }
 
-        public void ExtractZipFile( string archiveFilenameIn, string outFolder )
+        /// <summary>
+        /// Customized version of the Support.ExtractZipFile method. We need to strip out any
+        /// extra folders until we find the RockWeb folder and use it's parent as the root.
+        /// TODO: This should be refactored to find the root folder and then use the standard
+        /// extraction method by passing in the "stripFolder".
+        /// </summary>
+        /// <param name="archiveFilenameIn">The ZIP file on disk to be extracted.</param>
+        /// <param name="outFolder">The destination folder to extract to.</param>
+        private void ExtractZipFile( string archiveFilenameIn, string outFolder )
         {
             ZipFile zf = null;
             try
@@ -171,6 +278,10 @@ namespace com.blueboxmoon.RockLauncher
                 FileStream fs = File.OpenRead( archiveFilenameIn );
                 zf = new ZipFile( fs );
 
+                //
+                // Find the parent directory of the RockWeb in the ZIP file and use that
+                // as the root path.
+                //
                 string stripPath = string.Empty;
                 foreach ( ZipEntry zipEntry in zf )
                 {
@@ -226,22 +337,58 @@ namespace com.blueboxmoon.RockLauncher
             }
         }
 
+        #endregion
+
+        #region Event Handlers
+
+        /// <summary>
+        /// Notification that the download has completed. Check for error and continue the operation.
+        /// </summary>
+        /// <param name="sender">The object that sent this event.</param>
+        /// <param name="e">The arguments that describe this event.</param>
         private void WebClient_DownloadFileCompleted( object sender, System.ComponentModel.AsyncCompletedEventArgs e )
         {
+            //
+            // Check if there was an error downloading.
+            //
             if ( e.Error != null )
             {
                 UpdateStatusText( e.Error.Message );
+                BuildCompleted?.Invoke( this, new EventArgs() );
+
                 return;
             }
 
-            string filename = System.IO.Path.Combine( Support.GetDataPath(), "temp.zip" );
-            UnpackRelease( filename );
+            //
+            // Start the unpack process.
+            //
+            UnpackRelease( Path.Combine( Support.GetDataPath(), "temp.zip" ) );
         }
 
+        /// <summary>
+        /// Update the status text with the progress of the download.
+        /// </summary>
+        /// <param name="sender">The object that sent this event.</param>
+        /// <param name="e">The arguments that describe this event.</param>
         private void WebClient_DownloadProgressChanged( object sender, DownloadProgressChangedEventArgs e )
         {
+            //
+            // Sadly, github doesn't tell us the final download size so we can't give
+            // a percentage.
+            //
             UpdateStatusText( string.Format( "Downloading {0:n0} MB...", e.BytesReceived / 1024.0d / 1024.0d ) );
         }
 
+        /// <summary>
+        /// Text has been received from one of the build tasks that needs to be displayed.
+        /// </summary>
+        /// <param name="sender">The object that sent this event.</param>
+        /// <param name="text">The text received from the console application.</param>
+        private void Console_StandardTextReceived( object sender, string text )
+        {
+            ConsoleOutput?.Invoke( this, text );
+        }
+
+        #endregion
     }
 }

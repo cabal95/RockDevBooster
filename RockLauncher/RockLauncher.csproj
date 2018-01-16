@@ -73,7 +73,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ConsoleAppManager.cs" />
+    <Compile Include="ConsoleApp.cs" />
     <Compile Include="InstancesView.xaml.cs">
       <DependentUpon>InstancesView.xaml</DependentUpon>
     </Compile>
@@ -82,6 +82,7 @@
     <Compile Include="TemplatesView.xaml.cs">
       <DependentUpon>TemplatesView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="VisualStudioInstall.cs" />
     <Page Include="GitHubVersions.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

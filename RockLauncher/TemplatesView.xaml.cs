@@ -2,18 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace com.blueboxmoon.RockLauncher
 {
@@ -22,20 +14,39 @@ namespace com.blueboxmoon.RockLauncher
     /// </summary>
     public partial class TemplatesView : UserControl
     {
+        #region Private Fields
+
+        /// <summary>
+        /// The singleton instance of this control.
+        /// </summary>
         static private TemplatesView DefaultTemplatesView;
 
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Initialize a new instance of this control.
+        /// </summary>
         public TemplatesView()
         {
-            DefaultTemplatesView = this;
-
             InitializeComponent();
 
             txtStatus.Text = string.Empty;
+
             UpdateState();
 
-            new Thread( LoadData ).Start();
+            DefaultTemplatesView = this;
+            UpdateTemplates();
         }
 
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Update the list of templates.
+        /// </summary>
         static public void UpdateTemplates()
         {
             DefaultTemplatesView.btnDeploy.IsEnabled = false;
@@ -43,6 +54,25 @@ namespace com.blueboxmoon.RockLauncher
 
             new Thread( DefaultTemplatesView.LoadData ).Start();
         }
+
+        #endregion
+
+        #region Internal Methods
+
+        /// <summary>
+        /// Update the UI to reflect the internal state.
+        /// </summary>
+        protected void UpdateState()
+        {
+            bool buttonsEnabled = cbTemplates.SelectedIndex != -1;
+
+            btnDelete.IsEnabled = buttonsEnabled;
+            btnDeploy.IsEnabled = buttonsEnabled;
+        }
+
+        #endregion
+
+        #region Tasks
 
         /// <summary>
         /// Load all data in the background.
@@ -66,40 +96,58 @@ namespace com.blueboxmoon.RockLauncher
             } );
         }
 
-        protected void UpdateState()
-        {
-            bool buttonsEnabled = cbTemplates.SelectedIndex != -1;
+        #endregion
 
-            btnDelete.IsEnabled = buttonsEnabled;
-            btnDeploy.IsEnabled = buttonsEnabled;
-        }
+        #region Event Handlers
 
-        private void ComboBox_SelectionChanged( object sender, SelectionChangedEventArgs e )
+        /// <summary>
+        /// The template selection has changed, update the UI state.
+        /// </summary>
+        /// <param name="sender">The object that has sent this event.</param>
+        /// <param name="e">The arguments that describe this event.</param>
+        private void cbTemplates_SelectionChanged( object sender, SelectionChangedEventArgs e )
         {
             UpdateState();
         }
 
+        /// <summary>
+        /// Deploy a template as a new instance to be run.
+        /// </summary>
+        /// <param name="sender">The object that has sent this event.</param>
+        /// <param name="e">The arguments that describe this event.</param>
         private void btnDeploy_Click( object sender, RoutedEventArgs e )
         {
-            bool isValid = false;
-            string targetPath;
-
-            targetPath = System.IO.Path.Combine( Support.GetInstancesPath(), txtName.Text );
-            isValid = !string.IsNullOrWhiteSpace( txtName.Text ) && !Directory.Exists( targetPath );
-
+            //
+            // Check if this instance name is valid.
+            //
+            string targetPath = System.IO.Path.Combine( Support.GetInstancesPath(), txtName.Text );
+            bool isValid = !string.IsNullOrWhiteSpace( txtName.Text ) && !Directory.Exists( targetPath );
             if ( !isValid )
             {
                 MessageBox.Show( "That instance name already exists or is invalid." );
                 return;
             }
 
+            //
+            // Get the path to the template ZIP file.
+            //
             var items = cbTemplates.ItemsSource as List<string>;
             string file = items[cbTemplates.SelectedIndex] + ".zip";
             string zipfile = System.IO.Path.Combine( Support.GetTemplatesPath(), file );
 
+            //
+            // Disable any UI controls that should not be available while deploying.
+            //
             btnDeploy.IsEnabled = btnDelete.IsEnabled = false;
-            new Thread( () =>
+
+            //
+            // Deploy the template as a new instance.
+            //
+            new Task( () =>
              {
+                 //
+                 // Extract the zip file to the target instance path.
+                 //
                  Support.ExtractZipFile( zipfile, targetPath, ( progress ) =>
                  {
                      Dispatcher.Invoke( () =>
@@ -108,6 +156,9 @@ namespace com.blueboxmoon.RockLauncher
                      } );
                  } );
 
+                 //
+                 // Update the UI to indicate that it is deployed.
+                 //
                  Dispatcher.Invoke( () =>
                  {
                      txtStatus.Text = "Deployed";
@@ -118,6 +169,11 @@ namespace com.blueboxmoon.RockLauncher
              } ).Start();
         }
 
+        /// <summary>
+        /// Delete the selected template from disk.
+        /// </summary>
+        /// <param name="sender">The object that has sent this event.</param>
+        /// <param name="e">The arguments that describe this event.</param>
         private void btnDelete_Click( object sender, RoutedEventArgs e )
         {
             var result = MessageBox.Show( "Delete this template?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question );
@@ -134,5 +190,7 @@ namespace com.blueboxmoon.RockLauncher
                 new Thread( LoadData ).Start();
             }
         }
+
+        #endregion
     }
 }

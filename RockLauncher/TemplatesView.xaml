@@ -17,7 +17,7 @@
         <ComboBox Name="cbTemplates"
                   Margin="75,10,10,0"
                   VerticalAlignment="Top"
-                  SelectionChanged="ComboBox_SelectionChanged"
+                  SelectionChanged="cbTemplates_SelectionChanged"
                   />
 
         <Label
