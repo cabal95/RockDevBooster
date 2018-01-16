@@ -1,6 +1,6 @@
 # RockLauncher
 
-<img src="https://github.com/cabal95/RockLauncher/raw/master/RockLauncher/resources/RockLauncher.svg" title="Rock Launcher" alt="Rock Launcher" width="200px" style="float: right;">
+<img src="./RockLauncher/resources/RockLauncher.svg" title="Rock Launcher" alt="Rock Launcher" width="200px" style="float: right;">
 
 Provides a GUI application that allows you to download any version of Rock from github,
 compile it and store it as a template. These templates can be deployed any number of
