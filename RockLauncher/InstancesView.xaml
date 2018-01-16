@@ -31,7 +31,6 @@
                Style="{StaticResource labelStyleBold}"
                />
         <TextBox Name="txtPort"
-                 Height="23"
                  Margin="72,37,10,0"
                  TextWrapping="Wrap"
                  Text="6229"
@@ -41,7 +40,7 @@
 
         <Button Name="btnStart"
                 Content="&#xF04B; Start"
-                Margin="72,65,0,0"
+                Margin="72,72,0,0"
                 VerticalAlignment="Top"
                 HorizontalAlignment="Left"
                 Width="65"
@@ -50,7 +49,7 @@
                 />
         <Button Name="btnStop"
                 Content="&#xF04D; Stop"
-                Margin="142,65,0,0"
+                Margin="142,72,0,0"
                 VerticalAlignment="Top"
                 HorizontalAlignment="Left"
                 Width="65"
@@ -59,22 +58,22 @@
                 />
         <Button Name="btnDelete"
                 Content="&#xF00D; Delete"
-                Margin="0,65,10,0"
+                Margin="0,72,10,0"
                 VerticalAlignment="Top"
                 HorizontalAlignment="Right"
                 Width="73"
                 Click="btnDelete_Click"
                 Style="{StaticResource buttonStyleIconDanger}"/>
-        
+
         <TextBlock Name="txtStatus"
-                   Margin="0,106,0,0"
+                   Margin="0,113,0,0"
                    Text="Instance"
                    TextAlignment="Center"
                    VerticalAlignment="Top"
                    />
-        
+
         <TextBox Name="txtConsole"
-                 Margin="0,127,0,0"
+                 Margin="0,134,0,0"
                  TextWrapping="NoWrap"
                  HorizontalScrollBarVisibility="Visible"
                  VerticalScrollBarVisibility="Visible"

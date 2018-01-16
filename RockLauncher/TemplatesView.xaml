@@ -29,7 +29,6 @@
             Style="{StaticResource labelStyleBold}"
             />
         <TextBox Name="txtName"
-                 Height="23"
                  Margin="75,37,10,0"
                  TextWrapping="Wrap"
                  Text=""
@@ -41,7 +40,7 @@
 
         <Button Name="btnDeploy"
                 Content="&#xF0EE; Deploy"
-                Margin="75,65,0,0"
+                Margin="75,72,0,0"
                 VerticalAlignment="Top"
                 HorizontalAlignment="Left"
                 Width="80"
@@ -50,7 +49,7 @@
                 />
         <Button Name="btnDelete"
                 Content="&#xF00D; Delete"
-                Margin="0,65,10,0"
+                Margin="0,72,10,0"
                 VerticalAlignment="Top"
                 Width="75"
                 Click="btnDelete_Click"
@@ -58,6 +57,6 @@
                 Style="{StaticResource buttonStyleIconDanger}"
                 />
 
-        <TextBlock Name="txtStatus" Margin="10,106,10,10" TextWrapping="Wrap" Text="TextBlock"/>
+        <TextBlock Name="txtStatus" Margin="10,113,10,10" TextWrapping="Wrap" Text="TextBlock"/>
     </Grid>
 </UserControl>
