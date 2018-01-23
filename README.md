@@ -58,3 +58,8 @@ that the database has been closed.
 > expect the instance size to be around 600MB. 200MB of that is the transaction log from
 > initial Rock setup. A later version will include code to trim the log file each time
 > the instance is stopped.
+
+# Known Issues
+
+You may run into an issue with LocalDB not working at all. If so check your Event Log for the
+errors mentioned by this article: [https://stackoverflow.com/questions/15364542/what-does-the-datadirectory-registry-value-is-missing-in-the-localdb-instance](https://stackoverflow.com/questions/15364542/what-does-the-datadirectory-registry-value-is-missing-in-the-localdb-instance).
