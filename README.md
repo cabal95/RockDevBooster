@@ -61,5 +61,8 @@ that the database has been closed.
 
 # Known Issues
 
-You may run into an issue with LocalDB not working at all. If so check your Event Log for the
-errors mentioned by this article: [https://stackoverflow.com/questions/15364542/what-does-the-datadirectory-registry-value-is-missing-in-the-localdb-instance](https://stackoverflow.com/questions/15364542/what-does-the-datadirectory-registry-value-is-missing-in-the-localdb-instance).
+* You may run into an error related to LocalDB saying to check the windows application log.
+If you get this error see this article: [https://stackoverflow.com/questions/15364542/what-does-the-datadirectory-registry-value-is-missing-in-the-localdb-instance](https://stackoverflow.com/questions/15364542/what-does-the-datadirectory-registry-value-is-missing-in-the-localdb-instance).
+* When deploying a new template, the page may load without any CSS. This is due to the fact
+that the page loads before the background theme compiler has finished. Wait a few seconds
+and reload the page.
