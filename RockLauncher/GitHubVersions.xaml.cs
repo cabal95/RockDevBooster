@@ -108,7 +108,7 @@ namespace com.blueboxmoon.RockLauncher
             // Check if this template already exists.
             //
             var templateName = "RockBase-" + tag.Name;
-            if ( File.Exists( templateName + ".zip" ) )
+            if ( File.Exists( Path.Combine( Support.GetTemplatesPath(), templateName + ".zip" ) ) )
             {
                 MessageBox.Show( "A template with the name " + templateName + " already exists.", "Cannot import", MessageBoxButton.OK, MessageBoxImage.Hand );
                 return;

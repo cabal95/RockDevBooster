@@ -128,6 +128,34 @@ namespace com.blueboxmoon.RockLauncher
                 .Select( d => Path.GetFileName( d ) ).ToList();
 
             //
+            // Convert pre-1.0 instance folders to 1.0 instance folders, which contain a
+            // RockWeb for the current instance data.
+            //
+            foreach ( string instance in instances )
+            {
+                string instancePath = Path.Combine( Support.GetInstancesPath(), instance );
+                string rockwebPath = Path.Combine( instancePath, "RockWeb" );
+
+                if ( !Directory.Exists( rockwebPath ) )
+                {
+                    Directory.CreateDirectory( rockwebPath );
+
+                    foreach ( var d in Directory.GetDirectories( instancePath ) )
+                    {
+                        if ( !Path.GetFileName( d ).Equals( "RockWeb", StringComparison.CurrentCultureIgnoreCase ) )
+                        {
+                            Directory.Move( d, Path.Combine( rockwebPath, Path.GetFileName( d ) ) );
+                        }
+                    }
+
+                    foreach ( var f in Directory.GetFiles( instancePath ) )
+                    {
+                        Directory.Move( f, Path.Combine( rockwebPath, Path.GetFileName( f ) ) );
+                    }
+                }
+            }
+
+            //
             // Update the UI with the new list of instances.
             //
             Dispatcher.Invoke( () =>
@@ -265,7 +293,7 @@ namespace com.blueboxmoon.RockLauncher
             // Find the path to the RockWeb instance.
             //
             var items = ( List<string> ) cbInstances.ItemsSource;
-            var path = Path.Combine( Support.GetInstancesPath(), items[cbInstances.SelectedIndex] );
+            var path = Path.Combine( Support.GetInstancesPath(), items[cbInstances.SelectedIndex], "RockWeb" );
 
             //
             // Check if the Database file already exists and if not create the

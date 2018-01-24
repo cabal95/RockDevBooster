@@ -148,7 +148,7 @@ namespace com.blueboxmoon.RockLauncher
                  //
                  // Extract the zip file to the target instance path.
                  //
-                 Support.ExtractZipFile( zipfile, targetPath, ( progress ) =>
+                 Support.ExtractZipFile( zipfile, Path.Combine( targetPath, "RockWeb" ), ( progress ) =>
                  {
                      Dispatcher.Invoke( () =>
                      {
