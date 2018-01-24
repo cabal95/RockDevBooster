@@ -180,7 +180,7 @@ namespace com.blueboxmoon.RockLauncher
             UpdateStatusText( "Cleaning up..." );
             Directory.Delete( Support.GetBuildPath(), true );
             string tempfilename = Path.Combine( Support.GetDataPath(), "temp.zip" );
-            //File.Delete( tempfilename );
+            File.Delete( tempfilename );
 
             UpdateStatusText( "Template has been created." );
 
