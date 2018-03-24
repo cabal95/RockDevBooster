@@ -28,6 +28,11 @@
                     <local:TemplatesView/>
                 </Grid>
             </TabItem>
+            <TabItem Header="Package">
+                <Grid Background="#dbd5cb">
+                    <local:PackageView/>
+                </Grid>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>

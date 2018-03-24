@@ -67,6 +67,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WPFFolderBrowser, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WPFFolderBrowser.1.0.2\lib\WPFFolderBrowser.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -77,6 +80,10 @@
     <Compile Include="InstancesView.xaml.cs">
       <DependentUpon>InstancesView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PackageView.xaml.cs">
+      <DependentUpon>PackageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ProjectBuilder.cs" />
     <Compile Include="ReleaseBuilder.cs" />
     <Compile Include="Support.cs" />
     <Compile Include="TemplatesView.xaml.cs">
@@ -107,6 +114,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="PackageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="TemplatesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
