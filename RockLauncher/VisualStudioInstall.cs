@@ -27,6 +27,15 @@ namespace com.blueboxmoon.RockLauncher
         }
 
         /// <summary>
+        /// Get the path to the msbuild.exe executable for this installation.
+        /// </summary>
+        /// <returns>A full filesystem path or null if not found.</returns>
+        public string GetMsBuild()
+        {
+            return FindExecutable( Path, "msbuild.exe" );
+        }
+
+        /// <summary>
         /// Searches the installation tree recursively for the file.
         /// </summary>
         /// <param name="path">The path to search for the filename.</param>
