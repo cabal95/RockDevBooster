@@ -83,6 +83,7 @@
       <DependentUpon>TemplatesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="VisualStudioInstall.cs" />
+    <Compile Include="WindowPlacement.cs" />
     <Page Include="GitHubVersions.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
