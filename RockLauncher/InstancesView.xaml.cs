@@ -314,7 +314,7 @@ namespace com.blueboxmoon.RockLauncher
             iisExpressProcess = new ConsoleApp( GetIisExecutable() );
             iisExpressProcess.ProcessExited += IisExpressProcess_Exited;
             iisExpressProcess.StandardTextReceived += IisExpressProcess_StandardTextReceived;
-            iisExpressProcess.ExecuteAsync( String.Format( "/path:\"{0}\"", path ), String.Format( "/port:{0}", port ) );
+            iisExpressProcess.ExecuteAsync( String.Format( "/path:{0}", path ), String.Format( "/port:{0}", port ) );
 
             //
             // Update the status text to contain a clickable link to the instance.
