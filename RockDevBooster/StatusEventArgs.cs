@@ -1,4 +1,4 @@
-﻿namespace com.blueboxmoon.RockLauncher
+﻿namespace com.blueboxmoon.RockDevBooster
 {
     public class StatusEventArgs
     {

@@ -14,7 +14,7 @@ using System.Data.SqlLocalDb;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace com.blueboxmoon.RockLauncher
+namespace com.blueboxmoon.RockDevBooster
 {
     /// <summary>
     /// Interaction logic for InstancesView.xaml
@@ -104,7 +104,7 @@ namespace com.blueboxmoon.RockLauncher
                     //
                     // If we find an existing instance then shut it down and delete it.
                     //
-                    instance = provider.GetInstance( "RockLauncher" );
+                    instance = provider.GetInstance( "RockDevBooster" );
                     if ( instance.IsRunning )
                     {
                         instance.Stop();
@@ -116,7 +116,7 @@ namespace com.blueboxmoon.RockLauncher
                     //
                     // Create a new instance and keep a reference to it.
                     //
-                    localDb = provider.CreateInstance( "RockLauncher" );
+                    localDb = provider.CreateInstance( "RockDevBooster" );
                     localDb.Start();
                 }
             }
@@ -197,7 +197,7 @@ namespace com.blueboxmoon.RockLauncher
             string dbName = Path.GetFileName( rockWeb );
             string configFile = Path.Combine( rockWeb, "web.ConnectionStrings.config" );
 
-            string contents = string.Format( connectionStringTemplate, "RockLauncher", dbName );
+            string contents = string.Format( connectionStringTemplate, "RockDevBooster", dbName );
             if ( File.Exists( configFile ) )
             {
                 File.Delete( configFile );

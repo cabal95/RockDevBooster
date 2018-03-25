@@ -15,9 +15,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using com.blueboxmoon.RockLauncher.Properties;
+using com.blueboxmoon.RockDevBooster.Properties;
 
-namespace com.blueboxmoon.RockLauncher
+namespace com.blueboxmoon.RockDevBooster
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

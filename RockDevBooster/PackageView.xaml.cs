@@ -10,9 +10,9 @@ using Microsoft.Win32;
 
 using Newtonsoft.Json;
 
-using com.blueboxmoon.PluginFormat;
+using com.blueboxmoon.RockDevBooster.PluginFormat;
 
-namespace com.blueboxmoon.RockLauncher
+namespace com.blueboxmoon.RockDevBooster
 {
     /// <summary>
     /// Interaction logic for PackageView.xaml

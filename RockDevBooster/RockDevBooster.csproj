@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{79DD3DEE-34C5-4EC9-8754-2F7B0F2754E5}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>com.blueboxmoon.RockLauncher</RootNamespace>
-    <AssemblyName>RockLauncher</AssemblyName>
+    <RootNamespace>com.blueboxmoon.RockDevBooster</RootNamespace>
+    <AssemblyName>RockDevBooster</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -34,7 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>resources\RockLauncher.ico</ApplicationIcon>
+    <ApplicationIcon>resources\RockDevBooster.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
@@ -87,6 +87,7 @@
     <Compile Include="PluginFormat\Plugin.cs" />
     <Compile Include="ProjectBuilder.cs" />
     <Compile Include="ReleaseBuilder.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="StatusEventArgs.cs" />
     <Compile Include="Support.cs" />
     <Compile Include="TemplatesView.xaml.cs">
@@ -158,8 +159,8 @@
     <Content Include="nuget.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="resources\RockLauncher.svg" />
-    <Resource Include="resources\RockLauncher.ico" />
+    <None Include="resources\RockDevBooster.svg" />
+    <Resource Include="resources\RockDevBooster.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Rock.Wpf\Rock.Wpf.csproj">

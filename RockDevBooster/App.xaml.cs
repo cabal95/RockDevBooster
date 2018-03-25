@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace com.blueboxmoon.RockLauncher
+namespace com.blueboxmoon.RockDevBooster
 {
     /// <summary>
     /// Interaction logic for App.xaml

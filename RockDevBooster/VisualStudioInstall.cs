@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace com.blueboxmoon.RockLauncher
+namespace com.blueboxmoon.RockDevBooster
 {
     /// <summary>
     /// Identifies a single Visual Studio installation on disk.

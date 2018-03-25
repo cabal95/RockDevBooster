@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading;
 
-namespace com.blueboxmoon.RockLauncher
+namespace com.blueboxmoon.RockDevBooster
 {
     public class ProjectBuilder
     {

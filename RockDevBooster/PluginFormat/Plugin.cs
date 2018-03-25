@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
 
-namespace com.blueboxmoon.PluginFormat
+namespace com.blueboxmoon.RockDevBooster.PluginFormat
 {
     public class Plugin
     {

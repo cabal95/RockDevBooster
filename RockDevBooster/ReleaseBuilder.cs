@@ -7,7 +7,7 @@ using System.Xml;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 
-namespace com.blueboxmoon.RockLauncher
+namespace com.blueboxmoon.RockDevBooster
 {
     public class ReleaseBuilder
     {
@@ -69,7 +69,7 @@ namespace com.blueboxmoon.RockLauncher
 
             var webClient = new WebClient();
 
-            webClient.Headers.Add( "User-Agent", "RockLauncher" );
+            webClient.Headers.Add( "User-Agent", "RockDevBooster" );
             webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;
             webClient.DownloadFileCompleted += WebClient_DownloadFileCompleted;
             webClient.DownloadFileAsync( new Uri( url ), filename );

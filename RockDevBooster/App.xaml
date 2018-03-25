@@ -1,7 +1,7 @@
-﻿<Application x:Class="com.blueboxmoon.RockLauncher.App"
+﻿<Application x:Class="com.blueboxmoon.RockDevBooster.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:com.blueboxmoon.RockLauncher"
+             xmlns:local="clr-namespace:com.blueboxmoon.RockDevBooster"
              StartupUri="MainWindow.xaml"
              DispatcherUnhandledException="Application_Exception">
     <Application.Resources>

@@ -6,10 +6,10 @@ using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Core;
 using Microsoft.VisualStudio.Setup.Configuration;
 
-namespace com.blueboxmoon.RockLauncher
+namespace com.blueboxmoon.RockDevBooster
 {
     /// <summary>
-    /// Provides various helper methods used by the RockLauncher application.
+    /// Provides various helper methods used by the RockDevBooster application.
     /// </summary>
     static class Support
     {
@@ -47,17 +47,25 @@ namespace com.blueboxmoon.RockLauncher
         }
 
         /// <summary>
-        /// Get the filesystem path to the RockLauncher data folder.
+        /// Get the filesystem path to the RockDevBooster data folder.
         /// </summary>
         /// <returns>A string representing a location on the filesystem.</returns>
         static public string GetDataPath()
         {
             string appDataPath = Environment.GetEnvironmentVariable( "LocalAppData" );
-            string dataPath = Path.Combine( appDataPath, "RockLauncher" );
+            string oldDataPath = Path.Combine( appDataPath, "RockLauncher" );
+            string dataPath = Path.Combine( appDataPath, "RockDevBooster" );
 
             if ( !Directory.Exists( dataPath ) )
             {
-                Directory.CreateDirectory( dataPath );
+                if ( Directory.Exists( oldDataPath ) )
+                {
+                    Directory.Move( oldDataPath, dataPath );
+                }
+                else
+                {
+                    Directory.CreateDirectory( dataPath );
+                }
             }
 
             return dataPath;

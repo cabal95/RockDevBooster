@@ -5,7 +5,8 @@ using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace com.blueboxmoon.RockLauncher
+// Taken from https://blogs.msdn.microsoft.com/davidrickard/2010/03/08/saving-window-size-and-location-in-wpf-and-winforms/
+namespace com.blueboxmoon.RockDevBooster
 {
     // RECT structure required by WINDOWPLACEMENT structure
     [Serializable]

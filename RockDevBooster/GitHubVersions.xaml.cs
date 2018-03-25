@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 using Octokit;
 
-namespace com.blueboxmoon.RockLauncher
+namespace com.blueboxmoon.RockDevBooster
 {
     /// <summary>
     /// Interaction logic for GitHubVersions.xaml
@@ -61,7 +61,7 @@ namespace com.blueboxmoon.RockLauncher
         /// </summary>
         private async void LoadData()
         {
-            var client = new GitHubClient( new ProductHeaderValue( "RockLauncher" ) );
+            var client = new GitHubClient( new ProductHeaderValue( "RockDevBooster" ) );
             var tags = client.Repository.GetAllTags( "SparkDevNetwork", "Rock" );
             var minimumVersion = new Version( 1, 1, 0 );
 
