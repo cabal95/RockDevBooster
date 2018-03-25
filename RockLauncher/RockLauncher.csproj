@@ -77,14 +77,17 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ConsoleApp.cs" />
+    <Compile Include="PluginFormat\CopyFile.cs" />
     <Compile Include="InstancesView.xaml.cs">
       <DependentUpon>InstancesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="PackageView.xaml.cs">
       <DependentUpon>PackageView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PluginFormat\Plugin.cs" />
     <Compile Include="ProjectBuilder.cs" />
     <Compile Include="ReleaseBuilder.cs" />
+    <Compile Include="StatusEventArgs.cs" />
     <Compile Include="Support.cs" />
     <Compile Include="TemplatesView.xaml.cs">
       <DependentUpon>TemplatesView.xaml</DependentUpon>

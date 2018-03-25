@@ -64,6 +64,23 @@ namespace com.blueboxmoon.RockLauncher
         }
 
         /// <summary>
+        /// Get the path to the temporary package build directory.
+        /// </summary>
+        /// <returns>A string representing a location on the filesystem.</returns>
+        static public string GetPackageBuildPath()
+        {
+            string dataPath = GetDataPath();
+            string buildPath = Path.Combine( dataPath, "PackageBuild" );
+
+            if ( !Directory.Exists( buildPath ) )
+            {
+                Directory.CreateDirectory( buildPath );
+            }
+
+            return buildPath;
+        }
+
+        /// <summary>
         /// Get the path to the temporary build directory.
         /// </summary>
         /// <returns>A string representing a location on the filesystem.</returns>

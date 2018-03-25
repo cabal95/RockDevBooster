@@ -16,7 +16,7 @@
             Style="{StaticResource labelStyleBold}"
             />
         <Button x:Name="btnBuildPackage"
-            Content="&#xF06B; Build Package"
+            Content="&#xF1B2; Build Package"
             Margin="92,37,0,0"
             VerticalAlignment="Top"
             HorizontalAlignment="Left"

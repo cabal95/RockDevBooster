@@ -36,7 +36,7 @@ namespace com.blueboxmoon.RockLauncher
         /// <summary>
         /// Notification that the build has completed.
         /// </summary>
-        public event EventHandler BuildCompleted;
+        public event EventHandler<StatusEventArgs> BuildCompleted;
 
         #endregion
 
@@ -105,15 +105,15 @@ namespace com.blueboxmoon.RockLauncher
         /// <summary>
         /// Build the project so we have compiled DLLs.
         /// </summary>
-        public void BuildProject( string projectPath, string msbuild )
+        public void BuildProject( string projectFile, string msbuild )
         {
             //
             // Restore any NuGet packages.
             //
             UpdateStatusText( "Restoring References" );
-            if ( !NuGetRestore( projectPath ) )
+            if ( !NuGetRestore( Path.GetDirectoryName( projectFile ) ) )
             {
-                BuildCompleted?.Invoke( this, new EventArgs() );
+                BuildCompleted?.Invoke( this, new StatusEventArgs { Status = Status.Failed, Message = "Error while restoring NuGet references." } );
                 return;
             }
 
@@ -124,8 +124,8 @@ namespace com.blueboxmoon.RockLauncher
             var process = new ConsoleApp( msbuild );
             process.StandardTextReceived += Console_StandardTextReceived;
             process.ErrorTextReceived += Console_StandardTextReceived;
-            process.WorkingDirectory = projectPath;
-            process.ExecuteAsync( "/P:Configuration=Release" );
+            process.WorkingDirectory = Path.GetDirectoryName( projectFile );
+            process.ExecuteAsync( projectFile, "/P:Configuration=Release" );
 
             //
             // Wait for it to complete.
@@ -141,12 +141,12 @@ namespace com.blueboxmoon.RockLauncher
             if ( process.ExitCode != 0 )
             {
                 UpdateStatusText( "Build Failed." );
-                BuildCompleted?.Invoke( this, new EventArgs() );
+                BuildCompleted?.Invoke( this, new StatusEventArgs { Status = Status.Failed, Message = "Error while building project file. See log for details." } );
 
                 return;
             }
 
-            BuildCompleted?.Invoke( this, new EventArgs() );
+            BuildCompleted?.Invoke( this, new StatusEventArgs { Status = Status.Success } );
         }
 
         #region Event Handlers

@@ -6,64 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using com.blueboxmoon.RockLauncher.Properties;
 using Microsoft.Win32;
 
 using Newtonsoft.Json;
 
-namespace com.blueboxmoon.PluginFormat
-{
-    public class Plugin
-    {
-        public string Name { get; set; }
-
-        public string Organization { get; set; }
-
-        public string PluginPath { get; set; }
-
-        public string ControlsPath { get; set; }
-
-        public string ThemesPath { get; set; }
-
-        public string WebhooksPath { get; set; }
-
-        public string InstallSql { get; set; }
-
-        public string UninstallSql { get; set; }
-
-        public List<string> DLLs { get; set; }
-
-        public List<CopyFile> Copy { get; set; }
-
-        public List<string> RemoveFilesOnInstall { get; set; }
-
-        public List<string> RemoveFilesOnUninstall { get; set; }
-
-
-        public void ConfigureDefaults()
-        {
-            if ( string.IsNullOrWhiteSpace( PluginPath ) )
-            {
-                PluginPath = string.Format( "Plugins/com_{0}/{1}", Organization.ToLower().Replace( " ", "" ), Name.Replace( " ", "" ) );
-            }
-
-            ControlsPath = ControlsPath ?? "Controls";
-            ThemesPath = ThemesPath ?? "Themes";
-            WebhooksPath = WebhooksPath ?? "Webhooks";
-            DLLs = DLLs ?? new List<string>();
-            Copy = Copy ?? new List<CopyFile>();
-            RemoveFilesOnInstall = RemoveFilesOnInstall ?? new List<string>();
-            RemoveFilesOnUninstall = RemoveFilesOnUninstall ?? new List<string>();
-        }
-    }
-
-    public class CopyFile
-    {
-        public string Source { get; set; }
-
-        public string Destination { get; set; }
-    }
-}
+using com.blueboxmoon.PluginFormat;
 
 namespace com.blueboxmoon.RockLauncher
 {
@@ -79,12 +26,23 @@ namespace com.blueboxmoon.RockLauncher
         /// </summary>
         protected ProjectBuilder ProjectBuilder { get; set; }
 
-        protected string ProjectPath { get; set; }
+        /// <summary>
+        /// The plugin that was loaded.
+        /// </summary>
+        protected Plugin Plugin { get; set; }
+
+        /// <summary>
+        /// The path to the plugin file that was loaded.
+        /// </summary>
+        protected string PluginPath { get; set; }
 
         #endregion
 
         #region Constructors
 
+        /// <summary>
+        /// Create a new PackageView control.
+        /// </summary>
         public PackageView()
         {
             InitializeComponent();
@@ -104,22 +62,65 @@ namespace com.blueboxmoon.RockLauncher
             btnBuildPackage.IsEnabled = cbVisualStudio.SelectedIndex != -1;
         }
 
-        protected string CombinePaths( string mainPath, string path )
+        /// <summary>
+        /// Translate a path by replacing special character strings with references
+        /// in the plugin data.
+        /// </summary>
+        /// <param name="plugin">The plugin to use for reference replacement.</param>
+        /// <param name="path">The path string to be translated.</param>
+        /// <returns>A new path with the replacements done.</returns>
+        protected string TranslatePluginPath( Plugin plugin, string path )
+        {
+            return path
+                .Replace( "{Name}", plugin.Name )
+                .Replace( "{Organization}", plugin.Organization )
+                .Replace( "{PluginPath}", plugin.PluginPath )
+                .Replace( "{ControlsPath}", plugin.ControlsPath )
+                .Replace( "{ThemesPath}", plugin.ThemesPath )
+                .Replace( "{WebhooksPath}", plugin.WebhooksPath );
+        }
+
+        /// <summary>
+        /// Get the full path to a relative path to the project.
+        /// </summary>
+        /// <param name="plugin">The plugin to use for replacement services.</param>
+        /// <param name="relativePath">The relative path.</param>
+        /// <returns>The absolute path to the file.</returns>
+        protected string GetPluginRelativePath( Plugin plugin, string relativePath )
+        {
+            string path = null;
+
+            path = CombinePaths( PluginPath, relativePath, plugin );
+
+            return Path.GetFullPath( path );
+        }
+
+        /// <summary>
+        /// Combine two path components into a final path.
+        /// </summary>
+        /// <param name="mainPath">The left side of the path to be combined.</param>
+        /// <param name="path">The right side of the path to be combined.</param>
+        /// <param name="plugin">If not null, the path will be translated by the plugin references first.</param>
+        /// <returns>The full combined path.</returns>
+        protected string CombinePaths( string mainPath, string path, Plugin plugin )
         {
             List<string> paths = new List<string> { mainPath };
 
-            if ( path.Contains( "/" ) )
+            if ( plugin != null )
             {
-                paths.AddRange( path.Split( '/' ) );
+                path = TranslatePluginPath( plugin, path );
             }
-            else
-            {
-                paths.AddRange( path.Split( '\\' ) );
-            }
+
+            paths.AddRange( path.Split( '/', '\\' ) );
 
             return Path.Combine( paths.ToArray() );
         }
 
+        /// <summary>
+        /// Copy all files and directories recursively from the source path to the destination path.
+        /// </summary>
+        /// <param name="sourcePath">The path whose contents will be copied.</param>
+        /// <param name="destinationPath">The path where the contents will be copied into.</param>
         protected void CopyFiles( string sourcePath, string destinationPath )
         {
             if ( Directory.Exists( sourcePath ) )
@@ -130,19 +131,38 @@ namespace com.blueboxmoon.RockLauncher
                 foreach ( var file in files )
                 {
                     var strippedFile = file.Replace( stripName, string.Empty );
-                    var dest = CombinePaths( destinationPath, strippedFile );
+                    var dest = CombinePaths( destinationPath, strippedFile, null );
 
                     if ( !Directory.Exists( Path.GetDirectoryName( dest ) ) )
                     {
                         Directory.CreateDirectory( Path.GetDirectoryName( dest ) );
                     }
 
-                    File.Copy( file, dest );
+                    CopyFile( file, dest );
                 }
             }
         }
 
-        protected void CopyDLLs( List<string> dlls, string destinationPath )
+        /// <summary>
+        /// Copy a file and log the message.
+        /// </summary>
+        /// <param name="sourcePath">The source file to copy.</param>
+        /// <param name="destinationPath">The destination file path to copy to.</param>
+        protected void CopyFile( string sourcePath, string destinationPath )
+        {
+            txtConsole.AppendText( string.Format( "Copying \"{0}\" to \"{1}\"\n", sourcePath, destinationPath ) );
+            txtConsole.ScrollToEnd();
+
+            File.Copy( sourcePath, destinationPath );
+        }
+
+        /// <summary>
+        /// Copies all the DLLs from the bin\Release directory of the project into
+        /// the destination path.
+        /// </summary>
+        /// <param name="dlls">A list of DLL names to be copied.</param>
+        /// <param name="destinationPath">The path to copy all the files to.</param>
+        protected void CopyDLLs( string projectPath, List<string> dlls, string destinationPath )
         {
             foreach ( var file in dlls )
             {
@@ -153,20 +173,25 @@ namespace com.blueboxmoon.RockLauncher
                     Directory.CreateDirectory( Path.GetDirectoryName( dest ) );
                 }
 
-                File.Copy( Path.Combine( ProjectPath, "bin", "Release", file ), Path.Combine( destinationPath, file ) );
+                CopyFile( Path.Combine( projectPath, "bin", "Release", file ), Path.Combine( destinationPath, file ) );
             }
         }
 
-        protected List<string> GetFileList( string sourcePath )
+        /// <summary>
+        /// Gets a list of absolute paths to all files contained in the directory, recursively.
+        /// </summary>
+        /// <param name="path">The path to be searched.</param>
+        /// <returns>A list of strings representing the file names and paths.</returns>
+        protected List<string> GetFileList( string path )
         {
             var files = new List<string>();
 
-            foreach ( string f in Directory.GetFiles( sourcePath ) )
+            foreach ( string f in Directory.GetFiles( path ) )
             {
                 files.Add( f );
             }
 
-            foreach ( string d in Directory.GetDirectories( sourcePath ) )
+            foreach ( string d in Directory.GetDirectories( path ) )
             {
                 files.AddRange( GetFileList( d ) );
             }
@@ -174,24 +199,29 @@ namespace com.blueboxmoon.RockLauncher
             return files;
         }
 
+        /// <summary>
+        /// Build a package from all the components available.
+        /// </summary>
         protected void BuildPackage()
         {
             txtStatus.Text = "Packaging...";
 
-            var pluginJson = File.ReadAllText( Path.Combine( ProjectPath, "rockplugin.json" ) );
-            var pluginInfo = JsonConvert.DeserializeObject<PluginFormat.Plugin>( pluginJson );
-            var stagingPath = Path.Combine( Path.Combine( ProjectPath, "obj" ), "_Package" );
+            //
+            // Get all our staging paths.
+            //
+            var stagingPath = Support.GetPackageBuildPath();
             var contentPath = Path.Combine( stagingPath, "content" );
             var installPath = Path.Combine( stagingPath, "install" );
             var uninstallPath = Path.Combine( stagingPath, "uninstall" );
 
-            pluginInfo.ConfigureDefaults();
-
+            //
+            // Get the filename the user wants to save the plugin into.
+            //
             var saveFileDialog = new SaveFileDialog();
             saveFileDialog.DereferenceLinks = false;
-            saveFileDialog.FileName = pluginInfo.Name.Replace( " ", "" ) + ".plugin";
+            saveFileDialog.FileName = Plugin.Name.Replace( " ", "" ) + ".plugin";
             saveFileDialog.DefaultExt = "plugin";
-            saveFileDialog.Filter = "Plugin Files (*.plugin)|*.plugin";
+            saveFileDialog.Filter = "Plugin Files (*.plugin)|*.plugin|All Files (*.*)|*.*";
             if ( saveFileDialog.ShowDialog() == false )
             {
                 txtStatus.Text = "Cancelled";
@@ -201,11 +231,20 @@ namespace com.blueboxmoon.RockLauncher
             }
             string pluginFileName = saveFileDialog.FileName;
 
+            txtConsole.AppendText( string.Format( "\nBuilding package \"{0}\"\n", pluginFileName ) );
+            txtConsole.ScrollToEnd();
+
+            //
+            // Delete any failed builds.
+            //
             if ( Directory.Exists( stagingPath ) )
             {
                 Directory.Delete( stagingPath, true );
             }
 
+            //
+            // Create all our staging paths.
+            //
             Directory.CreateDirectory( stagingPath );
             Directory.CreateDirectory( contentPath );
             Directory.CreateDirectory( installPath );
@@ -214,44 +253,48 @@ namespace com.blueboxmoon.RockLauncher
             //
             // Copy the Controls, Themes, Webhooks.
             //
-            CopyFiles( CombinePaths( ProjectPath, pluginInfo.ControlsPath ), CombinePaths( contentPath, pluginInfo.PluginPath ) );
-            CopyFiles( CombinePaths( ProjectPath, pluginInfo.ThemesPath ), CombinePaths( contentPath, "Themes" ) );
-            CopyFiles( CombinePaths( ProjectPath, pluginInfo.WebhooksPath ), CombinePaths( contentPath, "Webhooks" ) );
+            CopyFiles( GetPluginRelativePath( Plugin, Plugin.ControlsPath ), CombinePaths( contentPath, Plugin.PluginPath, Plugin ) );
+            CopyFiles( GetPluginRelativePath( Plugin, Plugin.ThemesPath ), CombinePaths( contentPath, "Themes", null ) );
+            CopyFiles( GetPluginRelativePath( Plugin, Plugin.WebhooksPath ), CombinePaths( contentPath, "Webhooks", null ) );
 
             //
             // Copy DLLs.
             //
-            var dlls = GetFileList( Path.Combine( ProjectPath, "obj", "Release" ) )
-                .Select( f => Path.GetFileName( f ) )
-                .Where( f => f.EndsWith( ".dll" ) )
-                .ToList();
-            dlls.AddRange( pluginInfo.DLLs );
-            CopyDLLs( dlls, Path.Combine( contentPath, "bin" ) );
+            string projectFile = GetPluginRelativePath( Plugin, Plugin.ProjectFile );
+            if ( File.Exists( projectFile ) )
+            {
+                var dlls = GetFileList( Path.Combine( PluginPath, "obj", "Release" ) )
+                    .Select( f => Path.GetFileName( f ) )
+                    .Where( f => f.EndsWith( ".dll" ) )
+                    .ToList();
+                dlls.AddRange( Plugin.DLLs );
+                CopyDLLs( Path.GetDirectoryName( GetPluginRelativePath( Plugin, Plugin.ProjectFile ) ), dlls, Path.Combine( contentPath, "bin" ) );
+            }
 
             //
             // Copy the SQL scripts.
             //
-            if ( !string.IsNullOrWhiteSpace( pluginInfo.InstallSql ) )
+            if ( !string.IsNullOrWhiteSpace( Plugin.InstallSql ) )
             {
-                File.Copy( CombinePaths( ProjectPath, pluginInfo.InstallSql ), Path.Combine( installPath, "run.sql" ) );
+                CopyFile( GetPluginRelativePath( Plugin, Plugin.InstallSql ), Path.Combine( installPath, "run.sql" ) );
             }
-            if ( !string.IsNullOrWhiteSpace( pluginInfo.UninstallSql ) )
+            if ( !string.IsNullOrWhiteSpace( Plugin.UninstallSql ) )
             {
-                File.Copy( CombinePaths( ProjectPath, pluginInfo.UninstallSql ), Path.Combine( uninstallPath, "run.sql" ) );
+                CopyFile( GetPluginRelativePath( Plugin, Plugin.UninstallSql ), Path.Combine( uninstallPath, "run.sql" ) );
             }
 
             //
             // Copy any additional files.
             //
-            foreach ( var file in pluginInfo.Copy )
+            foreach ( var file in Plugin.Copy )
             {
-                File.Copy( CombinePaths( ProjectPath, file.Source ), CombinePaths( contentPath, file.Destination ) );
+                CopyFile( GetPluginRelativePath( Plugin, file.Source ), CombinePaths( contentPath, file.Destination, Plugin ) );
             }
 
             //
             // Build the install deletefile.lst.
             //
-            var files = pluginInfo.RemoveFilesOnInstall.Select( f => f.Replace( "/", "\\" ) ).ToList();
+            var files = Plugin.RemoveFilesOnInstall.Select( f => f.Replace( "/", "\\" ) ).ToList();
             File.WriteAllLines( Path.Combine( installPath, "deletefile.lst" ), files.ToArray() );
 
             //
@@ -259,12 +302,14 @@ namespace com.blueboxmoon.RockLauncher
             //
             string stripPath = string.Format( "{0}\\", contentPath );
             files = GetFileList( contentPath ).Select( f => f.Replace( stripPath, string.Empty ) ).ToList();
-            files.AddRange( pluginInfo.RemoveFilesOnUninstall.Select( f => f.Replace( "/", "\\" ) ) );
+            files.AddRange( Plugin.RemoveFilesOnUninstall.Select( f => f.Replace( "/", "\\" ) ) );
             File.WriteAllLines( Path.Combine( uninstallPath, "deletefile.lst" ), files.ToArray() );
 
             //
             // Zip it all up.
             //
+            txtConsole.AppendText( "Compressing zip file\n" );
+            txtConsole.ScrollToEnd();
             Support.CreateZipFromFolder( pluginFileName, stagingPath );
 
             txtStatus.Text = "Package Built.";
@@ -305,13 +350,29 @@ namespace com.blueboxmoon.RockLauncher
             var vsList = cbVisualStudio.ItemsSource as List<VisualStudioInstall>;
             var vs = vsList[cbVisualStudio.SelectedIndex];
 
-            var openFolderDialog = new WPFFolderBrowser.WPFFolderBrowserDialog();
-            openFolderDialog.DereferenceLinks = false;
-            if ( openFolderDialog.ShowDialog() == false )
+            var openFileDialog = new OpenFileDialog();
+            openFileDialog.DereferenceLinks = false;
+            openFileDialog.Filter = "Plugin Definitions (*.json)|*.json|All Files (*.*)|*.*";
+            if ( openFileDialog.ShowDialog() == false )
             {
                 return;
             }
-            ProjectPath = openFolderDialog.FileName;
+            PluginPath = Path.GetDirectoryName( openFileDialog.FileName );
+
+            //
+            // Try to read the plugin file.
+            //
+            try
+            {
+                var pluginJson = File.ReadAllText( Path.Combine( PluginPath, "rockplugin.json" ) );
+                Plugin = JsonConvert.DeserializeObject<Plugin>( pluginJson );
+                Plugin.ConfigureDefaults();
+            }
+            catch
+            {
+                MessageBox.Show( "Could not read plugin file.", "Build Error", MessageBoxButton.OK );
+                return;
+            }
 
             //
             // Initialize a new release builder to process this import operation.
@@ -330,10 +391,18 @@ namespace com.blueboxmoon.RockLauncher
             //
             // Start a task in the background to download and build the github release.
             //
-            new Task( () =>
+            string projectFile = GetPluginRelativePath( Plugin, Plugin.ProjectFile );
+            if ( File.Exists( projectFile ) )
             {
-                ProjectBuilder.BuildProject( ProjectPath, vs.GetMsBuild() );
-            } ).Start();
+                new Task( () =>
+                {
+                    ProjectBuilder.BuildProject( GetPluginRelativePath( Plugin, Plugin.ProjectFile ), vs.GetMsBuild() );
+                } ).Start();
+            }
+            else
+            {
+                BuildPackage();
+            }
         }
 
         /// <summary>
@@ -355,10 +424,17 @@ namespace com.blueboxmoon.RockLauncher
         /// </summary>
         /// <param name="sender">The object that sent this event.</param>
         /// <param name="e">The arguments describing this event.</param>
-        private void ProjectBuilder_BuildCompleted( object sender, EventArgs e )
+        private void ProjectBuilder_BuildCompleted( object sender, StatusEventArgs e )
         {
             Dispatcher.Invoke( () =>
             {
+                if ( e.Status == Status.Failed )
+                {
+                    txtStatus.Text = "Build Failed.";
+                    MessageBox.Show( e.Message, "Build Failed", MessageBoxButton.OK );
+                    return;
+                }
+
                 txtStatus.Text = "Build Completed.";
 
                 try
@@ -372,6 +448,8 @@ namespace com.blueboxmoon.RockLauncher
 
                     txtStatus.Text = "Packaging Failed";
                     UpdateState();
+
+                    MessageBox.Show( ex.Message, "Packaging Failed", MessageBoxButton.OK );
                 }
             } );
         }
