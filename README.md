@@ -10,4 +10,4 @@ by hand and slow down your development cycle.
 * Convert an instance into a template for easy re-deployment (snapshots).
 * Build a `.plugin` file for uploading to the Rock Shop in seconds.
 
-Read more on the ![Wiki](wiki)
+Read more on the ![Wiki](https://github.com/cabal95/RockDevBooster/wiki)
