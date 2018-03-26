@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:com.blueboxmoon.RockDevBooster"
              mc:Ignorable="d" 
              d:DesignHeight="300"
-             d:DesignWidth="350"
+             d:DesignWidth="400"
              MinWidth="350">
     <Grid>
         <Label
@@ -38,24 +38,23 @@
                  PreviewTextInput="txtPort_PreviewTextInput"
                  Style="{StaticResource textboxStyle}" Width="Auto" HorizontalAlignment="Stretch"/>
 
-        <Button Name="btnStart"
+        <Button Name="btnStartStop"
                 Content="&#xF04B; Start"
                 Margin="72,72,0,0"
                 VerticalAlignment="Top"
                 HorizontalAlignment="Left"
                 Width="65"
-                Click="btnStart_Click"
+                Click="btnStartStop_Click"
                 Style="{StaticResource buttonStyleIconSuccess}"
                 />
-        <Button Name="btnStop"
-                Content="&#xF04D; Stop"
-                Margin="142,72,0,0"
+        <Button Name="btnMakeTemplate"
+                Content="&#xF1B3; Make Template"
+                Margin="0,72,88,0"
                 VerticalAlignment="Top"
-                HorizontalAlignment="Left"
-                Width="65"
-                Click="btnStop_Click"
-                Style="{StaticResource buttonStyleIconAction}"
-                />
+                HorizontalAlignment="Right"
+                Width="126"
+                Click="btnMakeTemplate_Click"
+                Style="{StaticResource buttonStyleIconAction}"/>
         <Button Name="btnDelete"
                 Content="&#xF00D; Delete"
                 Margin="0,72,10,0"

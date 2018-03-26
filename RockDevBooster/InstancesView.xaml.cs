@@ -75,9 +75,11 @@ namespace com.blueboxmoon.RockDevBooster
         {
             DefaultInstancesView.txtStatus.Text = "Loading...";
 
+            DefaultInstancesView.cbInstances.IsEnabled = false;
             DefaultInstancesView.btnDelete.IsEnabled = false;
-            DefaultInstancesView.btnStart.IsEnabled = false;
-            DefaultInstancesView.btnStop.IsEnabled = false;
+            DefaultInstancesView.btnStartStop.IsEnabled = false;
+            DefaultInstancesView.btnMakeTemplate.IsEnabled = false;
+            DefaultInstancesView.txtPort.IsEnabled = false;
 
             new Task( DefaultInstancesView.LoadData ).Start();
         }
@@ -183,9 +185,27 @@ namespace com.blueboxmoon.RockDevBooster
         {
             bool enableButtons = cbInstances.SelectedIndex != -1;
 
-            btnStart.IsEnabled = enableButtons && iisExpressProcess == null;
-            btnStop.IsEnabled = enableButtons && iisExpressProcess != null;
+            btnStartStop.IsEnabled = enableButtons;
             btnDelete.IsEnabled = enableButtons && iisExpressProcess == null;
+            btnMakeTemplate.IsEnabled = iisExpressProcess == null;
+            cbInstances.IsEnabled = iisExpressProcess == null;
+            txtPort.IsEnabled = iisExpressProcess == null;
+
+            Style style = null;
+            if ( iisExpressProcess == null )
+            {
+                btnStartStop.Content = "\uF04B Start";
+                style = ( Style ) TryFindResource( "buttonStyleIconSuccess" );
+            }
+            else
+            {
+                btnStartStop.Content = "\uF04D Stop";
+                style = ( Style ) TryFindResource( "buttonStyleIconDanger" );
+            }
+            if ( style != null )
+            {
+                btnStartStop.Style = style;
+            }
         }
 
         /// <summary>
@@ -194,7 +214,7 @@ namespace com.blueboxmoon.RockDevBooster
         /// <param name="rockWeb">The folder that contains the Rock instance.</param>
         private void ConfigureConnectionString( string rockWeb )
         {
-            string dbName = Path.GetFileName( rockWeb );
+            string dbName = Path.GetFileName( Path.GetDirectoryName( rockWeb ) );
             string configFile = Path.Combine( rockWeb, "web.ConnectionStrings.config" );
 
             string contents = string.Format( connectionStringTemplate, "RockDevBooster", dbName );
@@ -276,76 +296,101 @@ namespace com.blueboxmoon.RockDevBooster
         /// </summary>
         /// <param name="sender">The object that is sending this event.</param>
         /// <param name="e">The arguments that describe the event.</param>
-        private void btnStart_Click( object sender, RoutedEventArgs e )
+        private void btnStartStop_Click( object sender, RoutedEventArgs e )
         {
-            txtStatus.Text = "Starting...";
-            txtConsole.Text = string.Empty;
-
-            //
-            // Just in case something goes wrong and they managed to type in a non-numeric.
-            //
-            if ( !int.TryParse( txtPort.Text, out int port ) )
+            if ( btnStartStop.Content.ToString().EndsWith( "Start" ) )
             {
-                port = 6229;
+                txtStatus.Text = "Starting...";
+                txtConsole.Text = string.Empty;
+
+                //
+                // Just in case something goes wrong and they managed to type in a non-numeric.
+                //
+                if ( !int.TryParse( txtPort.Text, out int port ) )
+                {
+                    port = 6229;
+                }
+
+                //
+                // Find the path to the RockWeb instance.
+                //
+                var items = ( List<string> ) cbInstances.ItemsSource;
+                var path = Path.Combine( Support.GetInstancesPath(), items[cbInstances.SelectedIndex], "RockWeb" );
+
+                //
+                // Check if the Database file already exists and if not create the
+                // Run.Migration file so Rock initializes itself.
+                //
+                var dbPath = Path.Combine( path, "App_Data", "Database.mdf" );
+                if ( !File.Exists( dbPath ) )
+                {
+                    var runMigrationPath = Path.Combine( path, "App_Data", "Run.Migration" );
+                    File.WriteAllText( runMigrationPath, string.Empty );
+                }
+
+                ConfigureConnectionString( path );
+
+                //
+                // Launch the IIS Express process for this RockWeb.
+                //
+                iisExpressProcess = new ConsoleApp( GetIisExecutable() );
+                iisExpressProcess.ProcessExited += IisExpressProcess_Exited;
+                iisExpressProcess.StandardTextReceived += IisExpressProcess_StandardTextReceived;
+                iisExpressProcess.ExecuteAsync( String.Format( "/path:{0}", path ), String.Format( "/port:{0}", port ) );
+
+                //
+                // Update the status text to contain a clickable link to the instance.
+                //
+                var linkText = string.Format( "http://localhost:{0}/", port );
+                var link = new Hyperlink( new Run( linkText ) )
+                {
+                    NavigateUri = new Uri( linkText )
+                };
+                link.RequestNavigate += StatusLink_RequestNavigate;
+                txtStatus.Inlines.Clear();
+                txtStatus.Inlines.Add( new Run( "Running at " ) );
+                txtStatus.Inlines.Add( link );
             }
-
-            //
-            // Find the path to the RockWeb instance.
-            //
-            var items = ( List<string> ) cbInstances.ItemsSource;
-            var path = Path.Combine( Support.GetInstancesPath(), items[cbInstances.SelectedIndex], "RockWeb" );
-
-            //
-            // Check if the Database file already exists and if not create the
-            // Run.Migration file so Rock initializes itself.
-            //
-            var dbPath = Path.Combine( path, "App_Data", "Database.mdf" );
-            if ( !File.Exists( dbPath ) )
+            else
             {
-                var runMigrationPath = Path.Combine( path, "App_Data", "Run.Migration" );
-                File.WriteAllText( runMigrationPath, string.Empty );
+                if ( iisExpressProcess != null )
+                {
+                    iisExpressProcess.Kill();
+                    iisExpressProcess = null;
+                }
+
+                try
+                {
+                    var items = ( List<string> ) cbInstances.ItemsSource;
+
+                    using ( var connection = localDb.CreateConnection() )
+                    {
+                        connection.Open();
+
+                        //
+                        // Shrink the log file.
+                        //
+                        connection.ChangeDatabase( items[cbInstances.SelectedIndex] );
+                        var cmd = connection.CreateCommand();
+                        cmd.CommandText = "DBCC SHRINKFILE ([Database_log.ldf], 1)";
+                        cmd.ExecuteNonQuery();
+
+                        //
+                        // Detach the database.
+                        //
+                        connection.ChangeDatabase( "master" );
+                        cmd = connection.CreateCommand();
+                        cmd.CommandText = string.Format( "exec sp_detach_db [{0}]", items[cbInstances.SelectedIndex] );
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                catch
+                {
+                    /* Intentionally left blank */
+                }
+
+                txtStatus.Text = "Idle";
             }
-
-            ConfigureConnectionString( path );
-
-            //
-            // Launch the IIS Express process for this RockWeb.
-            //
-            iisExpressProcess = new ConsoleApp( GetIisExecutable() );
-            iisExpressProcess.ProcessExited += IisExpressProcess_Exited;
-            iisExpressProcess.StandardTextReceived += IisExpressProcess_StandardTextReceived;
-            iisExpressProcess.ExecuteAsync( String.Format( "/path:{0}", path ), String.Format( "/port:{0}", port ) );
-
-            //
-            // Update the status text to contain a clickable link to the instance.
-            //
-            var linkText = string.Format( "http://localhost:{0}/", port );
-            var link = new Hyperlink( new Run( linkText ) )
-            {
-                NavigateUri = new Uri( linkText )
-            };
-            link.RequestNavigate += StatusLink_RequestNavigate;
-            txtStatus.Inlines.Clear();
-            txtStatus.Inlines.Add( new Run( "Running at " ) );
-            txtStatus.Inlines.Add( link );
-
-            UpdateState();
-        }
-
-        /// <summary>
-        /// Stop the current IIS Express instance.
-        /// </summary>
-        /// <param name="sender">The object that is sending this event.</param>
-        /// <param name="e">The arguments that describe the event.</param>
-        private void btnStop_Click( object sender, RoutedEventArgs e )
-        {
-            if ( iisExpressProcess != null )
-            {
-                iisExpressProcess.Kill();
-                iisExpressProcess = null;
-            }
-
-            txtStatus.Text = "Idle";
 
             UpdateState();
         }
@@ -370,6 +415,41 @@ namespace com.blueboxmoon.RockDevBooster
 
                 new Thread( LoadData ).Start();
             }
+        }
+
+        /// <summary>
+        /// Delete the selected instance from disk.
+        /// </summary>
+        /// <param name="sender">The object that is sending this event.</param>
+        /// <param name="e">The arguments that describe the event.</param>
+        private void btnMakeTemplate_Click( object sender, RoutedEventArgs e )
+        {
+            var textInputDialog = new Dialogs.TextInputDialog( this, "Template Name" );
+
+            if ( !textInputDialog.ShowDialog() ?? false )
+            {
+                return;
+            }
+            var templateName = textInputDialog.Text;
+
+            //
+            // Check if this template already exists.
+            //
+            if ( File.Exists( Path.Combine( Support.GetTemplatesPath(), templateName + ".zip" ) ) )
+            {
+                MessageBox.Show( "A template with the name " + templateName + " already exists.", "Cannot make template", MessageBoxButton.OK, MessageBoxImage.Hand );
+                return;
+            }
+
+            //
+            // Compress the RockWeb folder into a template ZIP file.
+            //
+            var zipFile = Path.Combine( Support.GetTemplatesPath(), templateName + ".zip" );
+            var items = ( List<string> ) cbInstances.ItemsSource;
+            var path = Path.Combine( Support.GetInstancesPath(), items[cbInstances.SelectedIndex], "RockWeb" );
+            Support.CreateZipFromFolder( zipFile, path );
+
+            TemplatesView.UpdateTemplates();
         }
 
         /// <summary>

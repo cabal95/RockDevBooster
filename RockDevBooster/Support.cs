@@ -214,7 +214,7 @@ namespace com.blueboxmoon.RockDevBooster
             FileStream fsOut = File.Create( outPathname );
             ZipOutputStream zipStream = new ZipOutputStream( fsOut );
 
-            zipStream.SetLevel( 9 );
+            zipStream.SetLevel( 3 );
             zipStream.Password = null;
 
             int folderOffset = folderName.Length + ( folderName.EndsWith( "\\" ) ? 0 : 1 );

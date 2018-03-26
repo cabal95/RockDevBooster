@@ -1,0 +1,34 @@
+﻿<Window x:Class="com.blueboxmoon.RockDevBooster.Dialogs.TextInputDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:com.blueboxmoon.RockDevBooster.Dialogs"
+        mc:Ignorable="d"
+        Title="TextInputDialog" Height="140" Width="400" ResizeMode="NoResize" Icon="/RockDevBooster;component/resources/RockDevBooster.ico" WindowStartupLocation="CenterOwner">
+    <Grid Margin="0,0,0,0">
+        <TextBox x:Name="txtInput"
+            Margin="10,10,10,0"
+            TextWrapping="Wrap"
+            Text=""
+            VerticalAlignment="Top"
+            Style="{StaticResource textboxStyle}" Width="Auto" HorizontalAlignment="Stretch"/>
+
+        <Button x:Name="btnCancel"
+            Content="Cancel"
+            Margin="0,0,10,10"
+            HorizontalAlignment="Right"
+            Width="73"
+            Click="btnCancel_Click"
+            Style="{StaticResource buttonStyleIcon}" Height="36" VerticalAlignment="Bottom"/>
+
+        <Button x:Name="btnOK"
+            Content="OK"
+            Margin="0,0,88,10"
+            HorizontalAlignment="Right"
+            Width="73"
+            Click="btnOK_Click"
+            IsDefault="True"
+            Style="{StaticResource buttonStyleIconSuccess}" Height="36" VerticalAlignment="Bottom"/>
+    </Grid>
+</Window>
