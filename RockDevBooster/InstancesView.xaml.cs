@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Data.SqlLocalDb;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace com.blueboxmoon.RockDevBooster
 {
@@ -58,10 +59,13 @@ namespace com.blueboxmoon.RockDevBooster
         {
             InitializeComponent();
 
-            DefaultInstancesView = this;
-            UpdateInstances();
+            if ( !DesignerProperties.GetIsInDesignMode( this ) )
+            {
+                DefaultInstancesView = this;
+                UpdateInstances();
 
-            Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
+                Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
+            }
         }
 
         #endregion

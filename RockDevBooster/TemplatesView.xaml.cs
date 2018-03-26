@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -32,12 +33,15 @@ namespace com.blueboxmoon.RockDevBooster
         {
             InitializeComponent();
 
-            txtStatus.Text = string.Empty;
+            if ( !DesignerProperties.GetIsInDesignMode( this ) )
+            {
+                txtStatus.Text = string.Empty;
 
-            UpdateState();
+                UpdateState();
 
-            DefaultTemplatesView = this;
-            UpdateTemplates();
+                DefaultTemplatesView = this;
+                UpdateTemplates();
+            }
         }
 
         #endregion

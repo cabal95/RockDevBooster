@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,10 +34,13 @@ namespace com.blueboxmoon.RockDevBooster
         {
             InitializeComponent();
 
-            txtStatus.Text = "Loading...";
-            btnImport.IsEnabled = false;
+            if ( !DesignerProperties.GetIsInDesignMode( this ) )
+            {
+                txtStatus.Text = "Loading...";
+                btnImport.IsEnabled = false;
 
-            new Task( LoadData ).Start();
+                new Task( LoadData ).Start();
+            }
         }
 
         #endregion
@@ -67,11 +71,19 @@ namespace com.blueboxmoon.RockDevBooster
 
             var vsList = Support.GetVisualStudioInstances();
 
-            var list = ( await tags )
-               .Select( t => new GitHubTag( t ) )
-               .Where( t => t.Version >= minimumVersion )
-               .OrderByDescending( t => t.Version )
-               .ToList();
+            List<GitHubTag> list;
+            try
+            {
+                list = ( await tags )
+                   .Select( t => new GitHubTag( t ) )
+                   .Where( t => t.Version >= minimumVersion )
+                   .OrderByDescending( t => t.Version )
+                   .ToList();
+            }
+            catch
+            {
+                list = new List<GitHubTag>();
+            }
             list.Insert( 0, new GitHubTag() );
 
             Dispatcher.Invoke( () =>

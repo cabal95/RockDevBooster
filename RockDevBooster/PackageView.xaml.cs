@@ -11,6 +11,7 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 
 using com.blueboxmoon.RockDevBooster.PluginFormat;
+using System.ComponentModel;
 
 namespace com.blueboxmoon.RockDevBooster
 {
@@ -47,7 +48,10 @@ namespace com.blueboxmoon.RockDevBooster
         {
             InitializeComponent();
 
-            LoadData();
+            if ( !DesignerProperties.GetIsInDesignMode( this ) )
+            {
+                LoadData();
+            }
         }
 
         #endregion
