@@ -27,6 +27,11 @@ namespace com.blueboxmoon.RockDevBooster
         public MainWindow()
         {
             InitializeComponent();
+
+            foreach ( TabItem item in tcMain.Items )
+            {
+                item.Visibility = Visibility.Collapsed;
+            }
         }
 
         protected override void OnClosing( CancelEventArgs e )
@@ -39,6 +44,12 @@ namespace com.blueboxmoon.RockDevBooster
         {
             base.OnSourceInitialized( e );
             WindowPlacement.SetPlacement( new WindowInteropHelper( this ).Handle, Settings.Default.MainWindowPlacement );
+        }
+
+        private void btnMenu_Click( object sender, RoutedEventArgs e )
+        {
+            string name = ( ( Button ) sender ).CommandParameter.ToString();
+            tcMain.SelectedIndex = tcMain.Items.Cast<TabItem>().ToList().FindIndex( i => i.Header.ToString() == name );
         }
     }
 }

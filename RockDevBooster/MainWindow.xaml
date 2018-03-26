@@ -12,7 +12,7 @@
         MinWidth="400"
         Background="#dbd5cb">
     <Grid>
-        <TabControl Background="#dbd5cb">
+        <TabControl Name="tcMain" BorderThickness="0" Background="#dbd5cb" Margin="80,0,0,0" Style="{StaticResource menuTabControl}">
             <TabItem Header="Instances">
                 <Grid Background="#dbd5cb">
                     <local:InstancesView />
@@ -34,5 +34,38 @@
                 </Grid>
             </TabItem>
         </TabControl>
+        <Grid
+            HorizontalAlignment="Left"
+            Margin="0,0,0,0"
+            Width="80"
+            Background="#3a3935">
+            <Button
+                Content="&#xf04b;"
+                Click="btnMenu_Click"
+                Style="{StaticResource buttonStyleMenuIcon}"
+                CommandParameter="Instances"
+                VerticalAlignment="Top" />
+            <Button
+                Content="&#xf09b;"
+                Margin="0,65,0,0"
+                Click="btnMenu_Click"
+                Style="{StaticResource buttonStyleMenuIcon}"
+                CommandParameter="GitHub Versions"
+                VerticalAlignment="Top" />
+            <Button
+                Content="&#xf0c5;"
+                Margin="0,130,0,0"
+                Click="btnMenu_Click"
+                Style="{StaticResource buttonStyleMenuIcon}"
+                CommandParameter="Templates"
+                VerticalAlignment="Top" />
+            <Button
+                Content="&#xf1b2;"
+                Margin="0,195,0,0"
+                Click="btnMenu_Click"
+                Style="{StaticResource buttonStyleMenuIcon}"
+                CommandParameter="Package"
+                VerticalAlignment="Top" />
+        </Grid>
     </Grid>
 </Window>

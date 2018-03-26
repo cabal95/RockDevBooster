@@ -24,7 +24,7 @@
             Click="btnBuildPackage_Click"
             Style="{StaticResource buttonStyleIconAction}"/>
         <TextBlock x:Name="txtStatus"
-            Margin="0,78,0,0"
+            Margin="10,78,10,0"
             TextWrapping="Wrap"
             Text="Status"
             TextAlignment="Center" Height="16" VerticalAlignment="Top"/>
@@ -35,12 +35,12 @@
             VerticalScrollBarVisibility="Visible"
             Text="{Binding Text, Mode=OneWay}"
             FontFamily="Consolas"
-            BorderThickness="1"
+            BorderThickness="0 1 0 0"
             IsReadOnly="True"
                  />
         <Label
             HorizontalAlignment="Left"
-            Margin="2,11,0,0"
+            Margin="10,8,0,0"
             Content="Build With"
             VerticalAlignment="Top"
             Width="75"
