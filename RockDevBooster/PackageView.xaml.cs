@@ -137,11 +137,6 @@ namespace com.blueboxmoon.RockDevBooster
                     var strippedFile = file.Replace( stripName, string.Empty );
                     var dest = CombinePaths( destinationPath, strippedFile, null );
 
-                    if ( !Directory.Exists( Path.GetDirectoryName( dest ) ) )
-                    {
-                        Directory.CreateDirectory( Path.GetDirectoryName( dest ) );
-                    }
-
                     CopyFile( file, dest );
                 }
             }
@@ -156,6 +151,11 @@ namespace com.blueboxmoon.RockDevBooster
         {
             txtConsole.AppendText( string.Format( "Copying \"{0}\" to \"{1}\"\n", sourcePath, destinationPath ) );
             txtConsole.ScrollToEnd();
+
+            if ( !Directory.Exists( Path.GetDirectoryName( destinationPath ) ) )
+            {
+                Directory.CreateDirectory( Path.GetDirectoryName( destinationPath ) );
+            }
 
             File.Copy( sourcePath, destinationPath );
         }
