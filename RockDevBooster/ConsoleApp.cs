@@ -120,7 +120,7 @@ public class ConsoleApp
             throw new InvalidOperationException( "Process is still Running. Please wait for the process to complete." );
         }
 
-        this.process.StartInfo.Arguments = string.Join( " ", args.Select( s => "\"" + s + "\"" ) );
+        this.process.StartInfo.Arguments = string.Join( " ", args.Select( s => s.Contains( " " ) ? "\"" + s + "\"" : s ) );
         this.context = SynchronizationContext.Current;
 
         this.process.Start();
