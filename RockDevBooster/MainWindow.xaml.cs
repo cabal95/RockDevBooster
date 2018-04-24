@@ -32,6 +32,22 @@ namespace com.blueboxmoon.RockDevBooster
             {
                 item.Visibility = Visibility.Collapsed;
             }
+
+            ActivateMenuSelection( btnMenuInstances );
+        }
+
+        protected void ActivateMenuSelection( Button button )
+        {
+            string name = button.CommandParameter.ToString();
+            tcMain.SelectedIndex = tcMain.Items.Cast<TabItem>().ToList().FindIndex( i => i.Header.ToString() == name );
+
+            var defaultStyle = ( Style ) FindResource( "buttonStyleMenuIcon" );
+            btnMenuInstances.Style = defaultStyle;
+            btnMenuGitHub.Style = defaultStyle;
+            btnMenuTemplates.Style = defaultStyle;
+            btnMenuPackage.Style = defaultStyle;
+
+            button.Style = ( Style ) FindResource( "buttonStyleMenuIconActive" );
         }
 
         protected override void OnClosing( CancelEventArgs e )
@@ -48,8 +64,7 @@ namespace com.blueboxmoon.RockDevBooster
 
         private void btnMenu_Click( object sender, RoutedEventArgs e )
         {
-            string name = ( ( Button ) sender ).CommandParameter.ToString();
-            tcMain.SelectedIndex = tcMain.Items.Cast<TabItem>().ToList().FindIndex( i => i.Header.ToString() == name );
+            ActivateMenuSelection( ( Button ) sender );
         }
     }
 }

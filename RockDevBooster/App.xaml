@@ -37,6 +37,12 @@
                 </Style.Triggers>
             </Style>
 
+            <Style x:Key="buttonStyleMenuIconActive"
+                   BasedOn="{StaticResource buttonStyleMenuIcon}"
+                   TargetType="{x:Type Button}">
+                <Setter Property="Foreground" Value="#ee7624" />
+            </Style>
+
             <!-- Button Style: Icon-->
             <Style x:Key="buttonStyleIcon"
                    BasedOn="{StaticResource buttonStyle}"

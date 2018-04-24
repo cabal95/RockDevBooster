@@ -40,12 +40,14 @@
             Width="80"
             Background="#3a3935">
             <Button
+                Name="btnMenuInstances"
                 Content="&#xf04b;"
                 Click="btnMenu_Click"
                 Style="{StaticResource buttonStyleMenuIcon}"
                 CommandParameter="Instances"
                 VerticalAlignment="Top" />
             <Button
+                Name="btnMenuGitHub"
                 Content="&#xf09b;"
                 Margin="0,65,0,0"
                 Click="btnMenu_Click"
@@ -53,6 +55,7 @@
                 CommandParameter="GitHub Versions"
                 VerticalAlignment="Top" />
             <Button
+                Name="btnMenuTemplates"
                 Content="&#xf0c5;"
                 Margin="0,130,0,0"
                 Click="btnMenu_Click"
@@ -60,6 +63,7 @@
                 CommandParameter="Templates"
                 VerticalAlignment="Top" />
             <Button
+                Name="btnMenuPackage"
                 Content="&#xf1b2;"
                 Margin="0,195,0,0"
                 Click="btnMenu_Click"
