@@ -8,8 +8,8 @@
         Title="Rock Dev Booster"
         Height="350"
         Width="525"
-        MinHeight="300"
-        MinWidth="400"
+        MinHeight="350"
+        MinWidth="525"
         Background="#dbd5cb">
     <Grid>
         <TabControl Name="tcMain" BorderThickness="0" Background="#dbd5cb" Margin="80,0,0,0" Style="{StaticResource menuTabControl}">
