@@ -13,6 +13,8 @@ namespace com.blueboxmoon.RockDevBooster
     /// </summary>
     static class Support
     {
+        #region Visual Studio Related
+
         /// <summary>
         /// Get a list of all the visual studio instances installed on the system.
         /// </summary>
@@ -45,6 +47,10 @@ namespace com.blueboxmoon.RockDevBooster
                 return new List<VisualStudioInstall>();
             }
         }
+
+        #endregion
+
+        #region Data Path Methods
 
         /// <summary>
         /// Get the filesystem path to the RockDevBooster data folder.
@@ -138,6 +144,10 @@ namespace com.blueboxmoon.RockDevBooster
 
             return instancesPath;
         }
+
+        #endregion
+
+        #region Archival Methods
 
         /// <summary>
         /// Extract a ZIP archive onto the filesystem.
@@ -271,5 +281,7 @@ namespace com.blueboxmoon.RockDevBooster
                 CompressFolder( folder, zipStream, folderOffset );
             }
         }
+
+        #endregion
     }
 }
