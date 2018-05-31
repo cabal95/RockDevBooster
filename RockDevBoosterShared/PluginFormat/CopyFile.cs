@@ -1,4 +1,4 @@
-﻿namespace com.blueboxmoon.RockDevBooster.PluginFormat
+﻿namespace com.blueboxmoon.RockDevBooster.Shared.PluginFormat
 {
     /// <summary>
     /// Defines the information in the plugin file for copying a single file.

@@ -36,6 +36,10 @@
   <PropertyGroup>
     <ApplicationIcon>resources\RockDevBooster.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>com.blueboxmoon.RockDevBooster.App</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -82,14 +86,12 @@
     <Compile Include="Dialogs\TextInputDialog.xaml.cs">
       <DependentUpon>TextInputDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PluginFormat\CopyFile.cs" />
     <Compile Include="InstancesView.xaml.cs">
       <DependentUpon>InstancesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="PackageView.xaml.cs">
       <DependentUpon>PackageView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PluginFormat\Plugin.cs" />
     <Compile Include="ProjectBuilder.cs" />
     <Compile Include="ReleaseBuilder.cs" />
     <Compile Include="Settings.cs" />
@@ -165,6 +167,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\SetupLinks\bin\Debug\SetupLinks.exe">
+      <Link>SetupLinks.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="nuget.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -175,6 +181,14 @@
     <ProjectReference Include="..\Rock.Wpf\Rock.Wpf.csproj">
       <Project>{90440596-fa0a-45e7-8872-3da47786f6a7}</Project>
       <Name>Rock.Wpf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RockDevBoosterShared\RockDevBoosterShared.csproj">
+      <Project>{34864b35-3f48-4351-a9fb-deb985eb477f}</Project>
+      <Name>RockDevBoosterShared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SetupLinks\SetupLinks.csproj">
+      <Project>{6e3d8b59-2ca4-401e-a0ba-d8b4a8451c23}</Project>
+      <Name>SetupLinks</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
