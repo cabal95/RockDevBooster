@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 
@@ -107,6 +109,35 @@ namespace com.blueboxmoon.RockDevBooster
         }
 
         /// <summary>
+        /// Gets the referenced projects.
+        /// </summary>
+        /// <returns></returns>
+        protected List<string> GetReferencedProjects()
+        {
+            var projectList = new List<string>();
+            var solution = File.ReadAllText( Path.Combine( Support.GetBuildPath(), "Rock.sln" ) );
+
+            var references = Regex.Match( solution, @"^\s*ProjectReferences\s*=\s*""(.*)""$", RegexOptions.Multiline );
+            if ( references.Success )
+            {
+                var matches = Regex.Matches( references.Groups[1].Value, @"{[\w\-]+}" );
+                foreach ( Match m in matches )
+                {
+                    var guidRef = m.Value;
+
+                    var reference = Regex.Match( solution, @"Project\(""{[\w\-]+}""\)\s*=\s*""([^""]+)"",\s*""[^""]+"",\s*""" + guidRef + @"""", RegexOptions.IgnoreCase );
+
+                    if ( reference.Success )
+                    {
+                        projectList.Add( reference.Groups[1].Value );
+                    }
+                }
+            }
+
+            return projectList;
+        }
+
+        /// <summary>
         /// Build the release so we have compiled DLLs.
         /// </summary>
         private void BuildRelease()
@@ -126,7 +157,7 @@ namespace com.blueboxmoon.RockDevBooster
             // does not copy indirect DLL references (e.g. the NuGet DLLs) into the
             // RockWeb folder, so we need to do that manually.
             //
-            foreach ( var d in Directory.EnumerateDirectories( Support.GetBuildPath() ) )
+            foreach ( var d in GetReferencedProjects() )
             {
                 CopyProjectReferences( d );
             }
