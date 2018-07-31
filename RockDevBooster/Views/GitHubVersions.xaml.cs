@@ -14,7 +14,7 @@ namespace com.blueboxmoon.RockDevBooster.Views
     /// <summary>
     /// Interaction logic for GitHubVersions.xaml
     /// </summary>
-    public partial class GitHubVersions : UserControl
+    public partial class GitHubVersions : UserControl, IViewDidShow
     {
         #region Protected Properties
 
@@ -22,6 +22,10 @@ namespace com.blueboxmoon.RockDevBooster.Views
         /// The ReleaseBuilder object that we are using to build a release.
         /// </summary>
         protected ReleaseBuilder ReleaseBuilder { get; set; }
+
+        protected List<GitHubItem> GitHubTags { get; set; }
+
+        protected List<GitHubItem> GitHubBranches { get; set; }
 
         #endregion
 
@@ -38,8 +42,6 @@ namespace com.blueboxmoon.RockDevBooster.Views
             {
                 txtStatus.Text = "Loading...";
                 btnImport.IsEnabled = false;
-
-                new Task( LoadData ).Start();
             }
         }
 
@@ -52,8 +54,39 @@ namespace com.blueboxmoon.RockDevBooster.Views
         /// </summary>
         protected void UpdateState()
         {
-            var tags = cbTags.ItemsSource as List<GitHubTag>;
-            btnImport.IsEnabled = cbTags.SelectedIndex != -1 && !string.IsNullOrEmpty( tags[cbTags.SelectedIndex].Name );
+            if ( cbSourceType.Text == "Release Version" )
+            {
+                var tags = cbSource.ItemsSource as List<GitHubItem>;
+                int index = cbSource.SelectedIndex;
+
+                btnImport.IsEnabled = index != -1 && !string.IsNullOrEmpty( tags[index].Name );
+            }
+            else if ( cbSourceType.Text == "Branch" )
+            {
+                var branches = cbSource.ItemsSource as List<GitHubItem>;
+                int index = cbSource.SelectedIndex;
+
+                btnImport.IsEnabled = index != -1 && !string.IsNullOrEmpty( branches[index].Name );
+            }
+            else if ( cbSourceType.Text == "SHA-1 Commit" )
+            {
+                btnImport.IsEnabled = !string.IsNullOrWhiteSpace( txtSource.Text );
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// The view has become visible on screen.
+        /// </summary>
+        public void ViewDidShow()
+        {
+            if ( GitHubTags == null )
+            {
+                new Task( LoadData ).Start();
+            }
         }
 
         #endregion
@@ -67,28 +100,38 @@ namespace com.blueboxmoon.RockDevBooster.Views
         {
             var client = new GitHubClient( new ProductHeaderValue( "RockDevBooster" ) );
             var tags = client.Repository.GetAllTags( "SparkDevNetwork", "Rock" );
+            var branches = client.Repository.Branch.GetAll( "SparkDevNetwork", "Rock" );
             var minimumVersion = new Version( 1, 1, 0 );
 
-            List<GitHubTag> list;
             try
             {
-                list = ( await tags )
-                   .Select( t => new GitHubTag( t ) )
+                GitHubTags = ( await tags )
+                   .Select( t => new GitHubItem( t ) )
                    .Where( t => t.Version >= minimumVersion )
                    .OrderByDescending( t => t.Version )
+                   .ToList();
+
+                GitHubBranches = ( await branches )
+                   .Select( b => new GitHubItem( b ) )
+                   .OrderBy( b => b.Name )
                    .ToList();
             }
             catch
             {
-                list = new List<GitHubTag>();
+                GitHubTags = new List<GitHubItem>();
+                GitHubBranches = new List<GitHubItem>();
             }
-            list.Insert( 0, new GitHubTag() );
+            GitHubTags.Insert( 0, new GitHubItem() );
+            GitHubBranches.Insert( 0, new GitHubItem() );
 
             Dispatcher.Invoke( () =>
             {
-                cbTags.ItemsSource = list;
-                txtStatus.Text = string.Empty;
-                cbTags.SelectedIndex = 0;
+                cbSourceType.Items.Add( "Release Version" );
+                cbSourceType.Items.Add( "Branch" );
+                cbSourceType.Items.Add( "SHA-1 Commit" );
+                cbSourceType.SelectedIndex = 0;
+
+                txtStatus.Text = "Ready";
             } );
         }
 
@@ -103,14 +146,27 @@ namespace com.blueboxmoon.RockDevBooster.Views
         /// <param name="e">The event arguments.</param>
         private void btnImport_Click( object sender, RoutedEventArgs e )
         {
-            var tags = cbTags.ItemsSource as List<GitHubTag>;
-            var tag = tags[cbTags.SelectedIndex];
             var vs = VisualStudioInstall.GetDefaultInstall();
+            GitHubItem item;
+
+            if ( cbSourceType.SelectedItem.ToString() == "Release Version" || cbSourceType.SelectedItem.ToString() == "Branch" )
+            {
+                var items = cbSource.ItemsSource as List<GitHubItem>;
+                item = items[cbSource.SelectedIndex];
+            }
+            else
+            {
+                item = new GitHubItem
+                {
+                    Name = txtSource.Text.ToLowerInvariant(),
+                    ZipballUrl = string.Format( "https://github.com/SparkDevNetwork/Rock/archive/{0}.zip", txtSource.Text.ToLowerInvariant() )
+                };
+            }
 
             //
             // Check if this template already exists.
             //
-            var templateName = "RockBase-" + tag.Name;
+            var templateName = "RockBase-" + item.Name;
             if ( File.Exists( Path.Combine( Support.GetTemplatesPath(), templateName + ".zip" ) ) )
             {
                 MessageBox.Show( "A template with the name " + templateName + " already exists.", "Cannot import", MessageBoxButton.OK, MessageBoxImage.Hand );
@@ -136,7 +192,7 @@ namespace com.blueboxmoon.RockDevBooster.Views
             //
             new Task( () =>
             {
-                ReleaseBuilder.DownloadRelease( tag.ZipballUrl, vs.GetExecutable(), "RockBase-" + tag.Name );
+                ReleaseBuilder.DownloadRelease( item.ZipballUrl, vs.GetExecutable(), "RockBase-" + item.Name );
             } ).Start();
         }
 
@@ -191,6 +247,41 @@ namespace com.blueboxmoon.RockDevBooster.Views
             } );
         }
 
+        /// <summary>
+        /// Handles the SelectionChanged event of the cbSourceType control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Controls.SelectionChangedEventArgs" /> instance containing the event data.</param>
+        private void cbSourceType_SelectionChanged( object sender, SelectionChangedEventArgs e )
+        {
+            if ( cbSourceType.SelectedItem.ToString() == "Release Version" )
+            {
+                lSource.Content = "Version";
+                txtSource.Visibility = Visibility.Hidden;
+
+                cbSource.ItemsSource = GitHubTags;
+                cbSource.SelectedIndex = 0;
+                cbSource.Visibility = Visibility.Visible;
+            }
+            else if ( cbSourceType.SelectedItem.ToString() == "Branch" )
+            {
+                lSource.Content = "Branch";
+                txtSource.Visibility = Visibility.Hidden;
+
+                cbSource.ItemsSource = GitHubBranches;
+                cbSource.SelectedIndex = 0;
+                cbSource.Visibility = Visibility.Visible;
+            }
+            else if ( cbSourceType.SelectedItem.ToString() == "SHA-1 Commit" )
+            {
+                lSource.Content = "Commit";
+                txtSource.Visibility = Visibility.Visible;
+                cbSource.Visibility = Visibility.Hidden;
+            }
+
+            UpdateState();
+        }
+
         #endregion
 
         #region Classes
@@ -198,7 +289,7 @@ namespace com.blueboxmoon.RockDevBooster.Views
         /// <summary>
         /// Helper class to identify a GutHub Tag Release.
         /// </summary>
-        protected class GitHubTag
+        protected class GitHubItem
         {
             public string Name { get; set; }
 
@@ -206,11 +297,11 @@ namespace com.blueboxmoon.RockDevBooster.Views
 
             public Version Version { get; set; }
 
-            public GitHubTag()
+            public GitHubItem()
             {
             }
 
-            public GitHubTag( RepositoryTag tag )
+            public GitHubItem( RepositoryTag tag )
             {
                 Name = tag.Name;
                 ZipballUrl = tag.ZipballUrl;
@@ -221,6 +312,13 @@ namespace com.blueboxmoon.RockDevBooster.Views
                     v = new Version();
                 }
                 Version = v;
+            }
+
+            public GitHubItem( Branch branch )
+            {
+                Name = branch.Name;
+                ZipballUrl = string.Format( "https://github.com/SparkDevNetwork/Rock/archive/{0}.zip", branch.Name );
+                Version = new Version();
             }
 
             public override string ToString()
