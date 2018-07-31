@@ -7,10 +7,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="400">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="7*"/>
-            <RowDefinition Height="93*"/>
-        </Grid.RowDefinitions>
         <Label
             HorizontalAlignment="Left"
             Margin="10,10,0,0"
@@ -20,5 +16,25 @@
             Style="{StaticResource labelStyleBold}" Grid.RowSpan="2"
             />
         <ComboBox Name="cbVisualStudio" Margin="90,10,10,0" VerticalAlignment="Top" SelectionChanged="cbVisualStudio_SelectionChanged" Grid.RowSpan="2"/>
+
+        <CheckBox Name="cbAutoUpdate"
+                  Style="{StaticResource checkboxStyle}"
+                  Content="Auto Update"
+                  Margin="90,37,10,0"
+                  VerticalAlignment="Top"
+                  Checked="cbAutoUpdate_Changed"
+                  Unchecked="cbAutoUpdate_Changed"
+                  />
+
+        <Button Name="btnCheckForUpdates"
+                Content="Check For Updates"
+                Margin="0,0,10,10"
+                HorizontalAlignment="Right"
+                Width="130"
+                Click="btnCheckForUpdates_Click"
+                IsDefault="True"
+                Style="{StaticResource buttonStyleAction}"
+                Height="36"
+                VerticalAlignment="Bottom"/>
     </Grid>
 </UserControl>

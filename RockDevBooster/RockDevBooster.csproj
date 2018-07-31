@@ -83,6 +83,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ConsoleApp.cs" />
+    <Compile Include="Dialogs\PendingUpdateDialog.xaml.cs">
+      <DependentUpon>PendingUpdateDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\TextInputDialog.xaml.cs">
       <DependentUpon>TextInputDialog.xaml</DependentUpon>
     </Compile>
@@ -106,6 +109,10 @@
     </Compile>
     <Compile Include="VisualStudioInstall.cs" />
     <Compile Include="WindowPlacement.cs" />
+    <Page Include="Dialogs\PendingUpdateDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\TextInputDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

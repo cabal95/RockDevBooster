@@ -1,0 +1,42 @@
+﻿<Window x:Class="com.blueboxmoon.RockDevBooster.Dialogs.PendingUpdateDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:com.blueboxmoon.RockDevBooster.Dialogs"
+        mc:Ignorable="d"
+        Title="New Version Available"
+        Height="140"
+        Width="400"
+        ResizeMode="NoResize"
+        Icon="/RockDevBooster;component/resources/RockDevBooster.ico"
+        WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Button x:Name="btnCancel"
+            Content="Cancel"
+            Margin="0,0,10,10"
+            HorizontalAlignment="Right"
+            Width="73"
+            Click="btnCancel_Click"
+            Style="{StaticResource buttonStyleIcon}" Height="36" VerticalAlignment="Bottom"/>
+
+        <Button Name="btnOK"
+                Content="Show Me"
+                Margin="0,0,88,10"
+                HorizontalAlignment="Right"
+                Width="90"
+                Click="btnOK_Click"
+                IsDefault="True"
+                Style="{StaticResource buttonStyleIconSuccess}"
+                Height="36"
+                VerticalAlignment="Bottom"/>
+        <TextBlock
+            HorizontalAlignment="Stretch"
+            Margin="10,10,10,0"
+            TextWrapping="WrapWithOverflow"
+            Text="A new version of RockDevBooster is available for download on github."
+            VerticalAlignment="Top"
+            Height="41"
+            />
+    </Grid>
+</Window>
