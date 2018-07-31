@@ -49,6 +49,16 @@ namespace com.blueboxmoon.RockDevBooster.Views
             btnMenuSettings.Style = defaultStyle;
 
             button.Style = ( Style ) FindResource( "buttonStyleMenuIconActive" );
+
+            var grid = tcMain.SelectedContent as Grid;
+            if ( grid != null )
+            {
+                var view = grid.Children[0] as IViewDidShow;
+                if ( view != null )
+                {
+                    view.ViewDidShow();
+                }
+            }
         }
 
         protected override void OnClosing( CancelEventArgs e )
