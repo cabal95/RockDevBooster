@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 using com.blueboxmoon.RockDevBooster.Shared.PluginFormat;
 using System.ComponentModel;
 
-namespace com.blueboxmoon.RockDevBooster
+namespace com.blueboxmoon.RockDevBooster.Views
 {
     /// <summary>
     /// Interaction logic for PackageView.xaml
@@ -63,7 +63,6 @@ namespace com.blueboxmoon.RockDevBooster
         /// </summary>
         protected void UpdateState()
         {
-            btnBuildPackage.IsEnabled = cbVisualStudio.SelectedIndex != -1;
         }
 
         /// <summary>
@@ -293,14 +292,6 @@ namespace com.blueboxmoon.RockDevBooster
         /// </summary>
         private void LoadData()
         {
-            var vsList = Support.GetVisualStudioInstances();
-
-            cbVisualStudio.ItemsSource = vsList;
-            if ( vsList.Count > 0 )
-            {
-                cbVisualStudio.SelectedIndex = 0;
-            }
-
             UpdateState();
         }
 
@@ -401,8 +392,7 @@ namespace com.blueboxmoon.RockDevBooster
         /// <param name="e">The event arguments.</param>
         private void btnBuildPackage_Click( object sender, RoutedEventArgs e )
         {
-            var vsList = cbVisualStudio.ItemsSource as List<VisualStudioInstall>;
-            var vs = vsList[cbVisualStudio.SelectedIndex];
+            var vs = VisualStudioInstall.GetDefaultInstall();
 
             var openFileDialog = new OpenFileDialog();
             openFileDialog.DereferenceLinks = false;

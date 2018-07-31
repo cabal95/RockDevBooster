@@ -17,7 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using com.blueboxmoon.RockDevBooster.Properties;
 
-namespace com.blueboxmoon.RockDevBooster
+namespace com.blueboxmoon.RockDevBooster.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -46,6 +46,7 @@ namespace com.blueboxmoon.RockDevBooster
             btnMenuGitHub.Style = defaultStyle;
             btnMenuTemplates.Style = defaultStyle;
             btnMenuPackage.Style = defaultStyle;
+            btnMenuSettings.Style = defaultStyle;
 
             button.Style = ( Style ) FindResource( "buttonStyleMenuIconActive" );
         }

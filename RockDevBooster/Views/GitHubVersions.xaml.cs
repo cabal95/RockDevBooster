@@ -9,7 +9,7 @@ using System.Windows.Controls;
 
 using Octokit;
 
-namespace com.blueboxmoon.RockDevBooster
+namespace com.blueboxmoon.RockDevBooster.Views
 {
     /// <summary>
     /// Interaction logic for GitHubVersions.xaml
@@ -53,7 +53,7 @@ namespace com.blueboxmoon.RockDevBooster
         protected void UpdateState()
         {
             var tags = cbTags.ItemsSource as List<GitHubTag>;
-            btnImport.IsEnabled = cbTags.SelectedIndex != -1 && cbVisualStudio.SelectedIndex != -1 && !string.IsNullOrEmpty( tags[cbTags.SelectedIndex].Name );
+            btnImport.IsEnabled = cbTags.SelectedIndex != -1 && !string.IsNullOrEmpty( tags[cbTags.SelectedIndex].Name );
         }
 
         #endregion
@@ -68,8 +68,6 @@ namespace com.blueboxmoon.RockDevBooster
             var client = new GitHubClient( new ProductHeaderValue( "RockDevBooster" ) );
             var tags = client.Repository.GetAllTags( "SparkDevNetwork", "Rock" );
             var minimumVersion = new Version( 1, 1, 0 );
-
-            var vsList = Support.GetVisualStudioInstances();
 
             List<GitHubTag> list;
             try
@@ -91,12 +89,6 @@ namespace com.blueboxmoon.RockDevBooster
                 cbTags.ItemsSource = list;
                 txtStatus.Text = string.Empty;
                 cbTags.SelectedIndex = 0;
-
-                cbVisualStudio.ItemsSource = vsList;
-                if ( vsList.Count > 0 )
-                {
-                    cbVisualStudio.SelectedIndex = 0;
-                }
             } );
         }
 
@@ -113,8 +105,7 @@ namespace com.blueboxmoon.RockDevBooster
         {
             var tags = cbTags.ItemsSource as List<GitHubTag>;
             var tag = tags[cbTags.SelectedIndex];
-            var vsList = cbVisualStudio.ItemsSource as List<VisualStudioInstall>;
-            var vs = vsList[cbVisualStudio.SelectedIndex];
+            var vs = VisualStudioInstall.GetDefaultInstall();
 
             //
             // Check if this template already exists.

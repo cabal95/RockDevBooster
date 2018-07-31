@@ -15,7 +15,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.ComponentModel;
 
-namespace com.blueboxmoon.RockDevBooster
+namespace com.blueboxmoon.RockDevBooster.Views
 {
     /// <summary>
     /// Interaction logic for InstancesView.xaml

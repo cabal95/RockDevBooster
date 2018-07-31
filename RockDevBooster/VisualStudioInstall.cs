@@ -1,4 +1,9 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.IO;
+
+using Microsoft.VisualStudio.Setup.Configuration;
+using com.blueboxmoon.RockDevBooster.Properties;
 
 namespace com.blueboxmoon.RockDevBooster
 {
@@ -71,5 +76,61 @@ namespace com.blueboxmoon.RockDevBooster
         {
             return Name;
         }
+
+        #region Static Methods
+
+        /// <summary>
+        /// Get a list of all the visual studio instances installed on the system.
+        /// </summary>
+        /// <returns>A collection of VisualStudioInstall objects.</returns>
+        static public List<VisualStudioInstall> GetVisualStudioInstances()
+        {
+            try
+            {
+                //
+                // Read the first 10 VS install locations. Safe assumption they have less than 10.
+                //
+                var e = new SetupConfiguration().EnumInstances();
+                var instances = new ISetupInstance[10];
+                e.Next( 10, instances, out int fetched );
+
+                var vsList = new List<VisualStudioInstall>();
+                for ( int i = 0; i < fetched; i++ )
+                {
+                    vsList.Add( new VisualStudioInstall
+                    {
+                        Name = instances[i].GetDisplayName(),
+                        Path = instances[i].GetInstallationPath()
+                    } );
+                }
+
+                return vsList;
+            }
+            catch
+            {
+                return new List<VisualStudioInstall>();
+            }
+        }
+
+        /// <summary>
+        /// Gets the current install selected by the user, or the first installation.
+        /// </summary>
+        /// <returns>The visual studio install to use when building.</returns>
+        static public VisualStudioInstall GetDefaultInstall()
+        {
+            var instances = GetVisualStudioInstances();
+            var currentPath = Settings.Default.VisualStudioVersion;
+
+            var current = instances.Where( i => i.Path == currentPath ).FirstOrDefault();
+
+            if ( current == null && instances.Count > 0 )
+            {
+                current = instances.First();
+            }
+
+            return current;
+        }
+
+        #endregion
     }
 }

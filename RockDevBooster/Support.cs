@@ -1,10 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Core;
-using Microsoft.VisualStudio.Setup.Configuration;
 
 namespace com.blueboxmoon.RockDevBooster
 {
@@ -13,43 +11,6 @@ namespace com.blueboxmoon.RockDevBooster
     /// </summary>
     static class Support
     {
-        #region Visual Studio Related
-
-        /// <summary>
-        /// Get a list of all the visual studio instances installed on the system.
-        /// </summary>
-        /// <returns>A collection of VisualStudioInstall objects.</returns>
-        static public List<VisualStudioInstall> GetVisualStudioInstances()
-        {
-            try
-            {
-                //
-                // Read the first 10 VS install locations. Safe assumption they have less than 10.
-                //
-                var e = new SetupConfiguration().EnumInstances();
-                var instances = new ISetupInstance[10];
-                e.Next( 10, instances, out int fetched );
-
-                var vsList = new List<VisualStudioInstall>();
-                for ( int i = 0; i < fetched; i++ )
-                {
-                    vsList.Add( new VisualStudioInstall
-                    {
-                        Name = instances[i].GetDisplayName(),
-                        Path = instances[i].GetInstallationPath()
-                    } );
-                }
-
-                return vsList;
-            }
-            catch
-            {
-                return new List<VisualStudioInstall>();
-            }
-        }
-
-        #endregion
-
         #region Data Path Methods
 
         /// <summary>

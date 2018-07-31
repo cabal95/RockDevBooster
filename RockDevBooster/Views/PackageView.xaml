@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="com.blueboxmoon.RockDevBooster.PackageView"
+﻿<UserControl x:Class="com.blueboxmoon.RockDevBooster.Views.PackageView"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -17,19 +17,18 @@
             />
         <Button x:Name="btnBuildPackage"
             Content="&#xF1B2; Build Package"
-            Margin="92,37,0,0"
+            Margin="0,10,10,0"
             VerticalAlignment="Top"
-            HorizontalAlignment="Left"
             Width="118"
             Click="btnBuildPackage_Click"
-            Style="{StaticResource buttonStyleIconAction}"/>
+            Style="{StaticResource buttonStyleIconAction}" HorizontalAlignment="Right"/>
         <TextBlock x:Name="txtStatus"
-            Margin="10,78,10,0"
+            Margin="10,51,10,0"
             TextWrapping="Wrap"
             Text="Status"
             TextAlignment="Center" Height="16" VerticalAlignment="Top"/>
         <TextBox x:Name="txtConsole"
-            Margin="0,99,0,0"
+            Margin="0,72,0,0"
             TextWrapping="NoWrap"
             HorizontalScrollBarVisibility="Visible"
             VerticalScrollBarVisibility="Visible"
@@ -38,18 +37,9 @@
             BorderThickness="0 1 0 0"
             IsReadOnly="True"
                  />
-        <Label
-            HorizontalAlignment="Left"
-            Margin="10,8,0,0"
-            Content="Build With"
-            VerticalAlignment="Top"
-            Width="75"
-            Style="{StaticResource labelStyleBold}"
-            />
-        <ComboBox x:Name="cbVisualStudio" Margin="92,10,10,0" VerticalAlignment="Top"/>
         <Button x:Name="btnSetupLinks"
             Content="&#xF0C1; Setup Links"
-            Margin="0,37,10,0"
+            Margin="0,10,133,0"
             VerticalAlignment="Top"
             HorizontalAlignment="Right"
             Width="100"

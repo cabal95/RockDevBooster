@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace com.blueboxmoon.RockDevBooster
+namespace com.blueboxmoon.RockDevBooster.Views
 {
     /// <summary>
     /// Interaction logic for TemplatesView.xaml
