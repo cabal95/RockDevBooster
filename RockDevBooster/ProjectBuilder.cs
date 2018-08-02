@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace com.blueboxmoon.RockDevBooster
 {
@@ -32,11 +33,6 @@ namespace com.blueboxmoon.RockDevBooster
         /// Notification that the stdout has new text to be displayed.
         /// </summary>
         public event EventHandler<string> ConsoleOutput;
-
-        /// <summary>
-        /// Notification that the build has completed.
-        /// </summary>
-        public event EventHandler<StatusEventArgs> BuildCompleted;
 
         #endregion
 
@@ -105,7 +101,7 @@ namespace com.blueboxmoon.RockDevBooster
         /// <summary>
         /// Build the project so we have compiled DLLs.
         /// </summary>
-        public void BuildProject( string projectFile, string msbuild )
+        public bool BuildProject( string projectFile, string msbuild )
         {
             //
             // Restore any NuGet packages.
@@ -113,8 +109,7 @@ namespace com.blueboxmoon.RockDevBooster
             UpdateStatusText( "Restoring References" );
             if ( !NuGetRestore( Path.GetDirectoryName( projectFile ) ) )
             {
-                BuildCompleted?.Invoke( this, new StatusEventArgs { Status = Status.Failed, Message = "Error while restoring NuGet references." } );
-                return;
+                return false;
             }
 
             //
@@ -132,7 +127,7 @@ namespace com.blueboxmoon.RockDevBooster
             //
             while ( process.Running )
             {
-                Thread.Sleep( 100 );
+                Task.Delay( 100 ).Wait();
             }
 
             //
@@ -140,13 +135,10 @@ namespace com.blueboxmoon.RockDevBooster
             //
             if ( process.ExitCode != 0 )
             {
-                UpdateStatusText( "Build Failed." );
-                BuildCompleted?.Invoke( this, new StatusEventArgs { Status = Status.Failed, Message = "Error while building project file. See log for details." } );
-
-                return;
+                return false;
             }
 
-            BuildCompleted?.Invoke( this, new StatusEventArgs { Status = Status.Success } );
+            return true;
         }
 
         #region Event Handlers

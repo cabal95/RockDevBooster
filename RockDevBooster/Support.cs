@@ -178,6 +178,31 @@ namespace com.blueboxmoon.RockDevBooster
         /// <summary>
         /// Create a new ZIP file from the contents of a directory on disk.
         /// </summary>
+        /// <param name="folderName">The directory to be compressed.</param>
+        /// <returns>A stream that contains the zip contents.</returns>
+        static public Stream CreateZipStreamFromFolder( string folderName )
+        {
+            var outStream = new MemoryStream();
+            ZipOutputStream zipStream = new ZipOutputStream( outStream );
+
+            zipStream.IsStreamOwner = false;
+            zipStream.SetLevel( 3 );
+            zipStream.Password = null;
+
+            int folderOffset = folderName.Length + ( folderName.EndsWith( "\\" ) ? 0 : 1 );
+
+            CompressFolder( folderName, zipStream, folderOffset );
+
+            zipStream.Close();
+
+            outStream.Position = 0;
+
+            return outStream;
+        }
+
+        /// <summary>
+        /// Create a new ZIP file from the contents of a directory on disk.
+        /// </summary>
         /// <param name="outPathname">The full path to the new ZIP file.</param>
         /// <param name="folderName">The directory to be compressed.</param>
         static public void CreateZipFromFolder( string outPathname, string folderName )

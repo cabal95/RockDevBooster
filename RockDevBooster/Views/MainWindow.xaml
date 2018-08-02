@@ -41,9 +41,14 @@
                     <views:TemplatesView/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Package">
+            <TabItem Header="Build Plugin">
                 <Grid Background="#dbd5cb">
-                    <views:PackageView/>
+                    <views:BuildPluginView/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Setup Plugin Links">
+                <Grid Background="#dbd5cb">
+                    <views:SetupPluginLinksView/>
                 </Grid>
             </TabItem>
             <TabItem Header="Settings">
@@ -68,7 +73,8 @@
                         <StackPanel Background="#3a3935">
                             <Label Content="Launcher" Style="{StaticResource subMenuHeader}" />
                             <Button Name="btnMenuLauncherInstances" CommandParameter="btnMenuLauncher,Instances" Content="Instances" Style="{StaticResource subMenuButton}" Click="btnMenu_Click" />
-                            <Button Name="btnMenuLauncherTemplates" CommandParameter="btnMenuLauncher,Templates" Content="Templates" Style="{StaticResource subMenuButton}" Click="btnMenu_Click" />
+                            <Button CommandParameter="btnMenuLauncher,Templates" Content="Templates" Style="{StaticResource subMenuButton}" Click="btnMenu_Click" />
+                            <Label />
                         </StackPanel>
                     </Popup>
                 </local:Extensions.Popup>
@@ -82,13 +88,23 @@
                 CommandParameter="GitHub Versions"
                 VerticalAlignment="Top" />
             <Button
-                Name="btnMenuPackage"
+                Name="btnMenuPlugin"
                 Content="&#xf1b2;"
                 Margin="0,130,0,0"
                 Click="btnMenu_Click"
                 Style="{StaticResource buttonStyleMenuIcon}"
-                CommandParameter="Package"
-                VerticalAlignment="Top" />
+                VerticalAlignment="Top">
+                <local:Extensions.Popup>
+                    <Popup Width="150" Placement="Right" StaysOpen="False">
+                        <StackPanel Background="#3a3935">
+                            <Label Content="Plugins" Style="{StaticResource subMenuHeader}" />
+                            <Button CommandParameter="btnMenuPlugin,Build Plugin" Content="Build Plugin" Style="{StaticResource subMenuButton}" Click="btnMenu_Click" />
+                            <Button CommandParameter="btnMenuPlugin,Setup Plugin Links" Content="Configure Plugin" Style="{StaticResource subMenuButton}" Click="btnMenu_Click" />
+                            <Label />
+                        </StackPanel>
+                    </Popup>
+                </local:Extensions.Popup>
+            </Button>
             <Button
                 Name="btnMenuSettings"
                 Content="&#xf013;"

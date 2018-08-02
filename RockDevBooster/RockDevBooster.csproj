@@ -91,11 +91,15 @@
     </Compile>
     <Compile Include="Extensions.cs" />
     <Compile Include="IViewDidShow.cs" />
+    <Compile Include="PluginBuilder.cs" />
+    <Compile Include="Views\BuildPluginView.xaml.cs">
+      <DependentUpon>BuildPluginView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\InstancesView.xaml.cs">
       <DependentUpon>InstancesView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\PackageView.xaml.cs">
-      <DependentUpon>PackageView.xaml</DependentUpon>
+    <Compile Include="Views\SetupPluginLinksView.xaml.cs">
+      <DependentUpon>SetupPluginLinksView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ProjectBuilder.cs" />
     <Compile Include="ReleaseBuilder.cs" />
@@ -115,6 +119,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\TextInputDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BuildPluginView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -141,7 +149,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\PackageView.xaml">
+    <Page Include="Views\SetupPluginLinksView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

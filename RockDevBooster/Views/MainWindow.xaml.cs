@@ -74,7 +74,7 @@ namespace com.blueboxmoon.RockDevBooster.Views
             var defaultStyle = ( Style ) FindResource( "buttonStyleMenuIcon" );
             btnMenuLauncher.Style = defaultStyle;
             btnMenuGitHub.Style = defaultStyle;
-            btnMenuPackage.Style = defaultStyle;
+            btnMenuPlugin.Style = defaultStyle;
             btnMenuSettings.Style = defaultStyle;
 
             menuButton.Style = ( Style ) FindResource( "buttonStyleMenuIconActive" );

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="com.blueboxmoon.RockDevBooster.Views.PackageView"
+﻿<UserControl x:Class="com.blueboxmoon.RockDevBooster.Views.BuildPluginView"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -10,25 +10,47 @@
     <Grid>
         <Label
             HorizontalAlignment="Left"
+            Margin="10,8,0,0"
+            Content="Plugin"
+            VerticalAlignment="Top"
+            Width="75"
+            Style="{StaticResource labelStyleBold}"
+            />
+        <Label Name="lSelectedPlugin"
+            HorizontalAlignment="Stretch"
+            Margin="90,8,10,0"
+            Content=""
+            VerticalAlignment="Top"
+            Style="{StaticResource labelStyleDd}"
+            />
+        <Label
+            HorizontalAlignment="Left"
             Margin="0,10,0,0"
             VerticalAlignment="Top"
             Width="75"
             Style="{StaticResource labelStyleBold}"
             />
-        <Button x:Name="btnBuildPackage"
-            Content="&#xF1B2; Build Package"
-            Margin="0,10,10,0"
+        <Button x:Name="btnSelect"
+            Content="Select Plugin"
+            Margin="0,36,133,0"
             VerticalAlignment="Top"
             Width="118"
-            Click="btnBuildPackage_Click"
+            Click="btnSelect_Click"
             Style="{StaticResource buttonStyleIconAction}" HorizontalAlignment="Right"/>
+        <Button x:Name="btnBuildPlugin"
+            Content="Build Plugin"
+            Margin="0,36,10,0"
+            VerticalAlignment="Top"
+            Width="118"
+            Click="btnBuildPlugin_Click"
+            Style="{StaticResource buttonStyleIconSuccess}" HorizontalAlignment="Right"/>
         <TextBlock x:Name="txtStatus"
-            Margin="10,51,10,0"
+            Margin="10,77,10,0"
             TextWrapping="Wrap"
             Text="Status"
             TextAlignment="Center" Height="16" VerticalAlignment="Top"/>
         <TextBox x:Name="txtConsole"
-            Margin="0,72,0,0"
+            Margin="0,98,0,0"
             TextWrapping="NoWrap"
             HorizontalScrollBarVisibility="Visible"
             VerticalScrollBarVisibility="Visible"
@@ -37,13 +59,5 @@
             BorderThickness="0 1 0 0"
             IsReadOnly="True"
                  />
-        <Button x:Name="btnSetupLinks"
-            Content="&#xF0C1; Setup Links"
-            Margin="0,10,133,0"
-            VerticalAlignment="Top"
-            HorizontalAlignment="Right"
-            Width="100"
-            Click="btnSetupLinks_Click"
-            Style="{StaticResource buttonStyleIconAction}"/>
     </Grid>
 </UserControl>
