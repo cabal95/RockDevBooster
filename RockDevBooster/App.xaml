@@ -17,7 +17,7 @@
                 <Setter Property="Width" Value="80" />
                 <Setter Property="Height" Value="65" />
                 <Setter Property="FontSize" Value="32" />
-                <Setter Property="Foreground" Value="White" />
+                <Setter Property="Foreground" Value="#f3f3f3" />
                 <Setter Property="BorderThickness" Value="0 0 0 1" />
                 <Setter Property="BorderBrush" Value="#4d4b46" />
                 <Setter Property="Background" Value="#3a3935"/>
@@ -132,6 +132,40 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
+            </Style>
+
+            <Style x:Key="subMenuHeader" TargetType="{x:Type Label}">
+                <Setter Property="Foreground" Value="#f3f3f3" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="Padding" Value="0,16" />
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="FontFamily" Value="{StaticResource OpenSans-SemiBold}" />
+                <Setter Property="Width" Value="150" />
+            </Style>
+
+            <Style x:Key="subMenuButton" TargetType="{x:Type Button}">
+                <Setter Property="Width" Value="150" />
+                <Setter Property="FontFamily" Value="{StaticResource OpenSans-Regular}" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="Foreground" Value="#f3f3f3" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Setter Property="Padding" Value="12,4" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border Name="buttonBorder" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Width="{TemplateBinding Width}" />
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Foreground" Value="#ee7624"/>
+                    </Trigger>
+                </Style.Triggers>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

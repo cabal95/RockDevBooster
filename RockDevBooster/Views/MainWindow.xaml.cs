@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -24,6 +25,8 @@ namespace com.blueboxmoon.RockDevBooster.Views
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Popup _lastPopup = null;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -33,7 +36,7 @@ namespace com.blueboxmoon.RockDevBooster.Views
                 item.Visibility = Visibility.Collapsed;
             }
 
-            ActivateMenuSelection( btnMenuInstances );
+            ActivateMenuSelection( btnMenuLauncherInstances );
         }
 
         /// <summary>
@@ -42,17 +45,39 @@ namespace com.blueboxmoon.RockDevBooster.Views
         /// <param name="button">The button.</param>
         protected void ActivateMenuSelection( Button button )
         {
-            string name = button.CommandParameter.ToString();
+            
+            if ( button.GetPopup() != null )
+            {
+                _lastPopup = button.GetPopup();
+                _lastPopup.PlacementTarget = button;
+                _lastPopup.IsOpen = true;
+
+                return;
+            }
+
+            Button menuButton = button;
+            var parameters = button.CommandParameter.ToString().Split( ',' );
+            string name = null;
+
+            if (parameters.Length == 1)
+            {
+                name = parameters[0];
+            }
+            else
+            {
+                menuButton = ( Button ) FindName( parameters[0] );
+                name = parameters[1];
+            }
+
             tcMain.SelectedIndex = tcMain.Items.Cast<TabItem>().ToList().FindIndex( i => i.Header.ToString() == name );
 
             var defaultStyle = ( Style ) FindResource( "buttonStyleMenuIcon" );
-            btnMenuInstances.Style = defaultStyle;
+            btnMenuLauncher.Style = defaultStyle;
             btnMenuGitHub.Style = defaultStyle;
-            btnMenuTemplates.Style = defaultStyle;
             btnMenuPackage.Style = defaultStyle;
             btnMenuSettings.Style = defaultStyle;
 
-            button.Style = ( Style ) FindResource( "buttonStyleMenuIconActive" );
+            menuButton.Style = ( Style ) FindResource( "buttonStyleMenuIconActive" );
 
             var grid = tcMain.SelectedContent as Grid;
             if ( grid != null )
@@ -62,6 +87,14 @@ namespace com.blueboxmoon.RockDevBooster.Views
                 {
                     view.ViewDidShow();
                 }
+            }
+
+            //
+            // Close any menu popups.
+            //
+            if ( _lastPopup != null && _lastPopup.IsOpen )
+            {
+                _lastPopup.IsOpen = false;
             }
         }
 

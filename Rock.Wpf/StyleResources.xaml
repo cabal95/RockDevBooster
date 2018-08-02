@@ -1,6 +1,11 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <FontFamily x:Key="OpenSans-SemiBold">./resources/#Open Sans SemiBold</FontFamily>
+    <FontFamily x:Key="OpenSans-Bold">./resources/#Open Sans Bold</FontFamily>
+    <FontFamily x:Key="OpenSans-Light">./resources/#Open Sans Light</FontFamily>
+    <FontFamily x:Key="OpenSans-Regular">./resources/#Open Sans Regular</FontFamily>
+    
     <!-- 
           Label Styles
         -->

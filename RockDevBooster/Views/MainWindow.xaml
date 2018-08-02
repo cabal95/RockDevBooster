@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:com.blueboxmoon.RockDevBooster.Views"
+        xmlns:views="clr-namespace:com.blueboxmoon.RockDevBooster.Views"
+        xmlns:local="clr-namespace:com.blueboxmoon.RockDevBooster"
         mc:Ignorable="d"
         Title="Rock Dev Booster"
         Height="400"
@@ -12,30 +13,42 @@
         MinWidth="525"
         Background="#dbd5cb">
     <Grid>
+        <Popup Name="pMenu"
+               Width="150"
+               Placement="Right"
+               StaysOpen="False"
+               >
+            <StackPanel                
+                Background="#3a3935">
+                <Label Content="Port" Style="{StaticResource subMenuHeader}" />
+                <Button Content="Instances" Style="{StaticResource subMenuButton}" />
+                <Button Content="Templates" Style="{StaticResource subMenuButton}" />
+            </StackPanel>
+        </Popup>
         <TabControl Name="tcMain" BorderThickness="0" Background="#dbd5cb" Margin="80,0,0,0" Style="{StaticResource menuTabControl}">
             <TabItem Header="Instances">
                 <Grid Background="#dbd5cb">
-                    <local:InstancesView />
+                    <views:InstancesView />
                 </Grid>
             </TabItem>
             <TabItem Header="GitHub Versions">
                 <Grid Background="#dbd5cb">
-                    <local:GitHubVersions />
+                    <views:GitHubVersions />
                 </Grid>
             </TabItem>
             <TabItem Header="Templates">
                 <Grid Background="#dbd5cb">
-                    <local:TemplatesView/>
+                    <views:TemplatesView/>
                 </Grid>
             </TabItem>
             <TabItem Header="Package">
                 <Grid Background="#dbd5cb">
-                    <local:PackageView/>
+                    <views:PackageView/>
                 </Grid>
             </TabItem>
             <TabItem Header="Settings">
                 <Grid Background="#dbd5cb">
-                    <local:PreferencesView/>
+                    <views:PreferencesView/>
                 </Grid>
             </TabItem>
         </TabControl>
@@ -45,12 +58,21 @@
             Width="80"
             Background="#3a3935">
             <Button
-                Name="btnMenuInstances"
+                Name="btnMenuLauncher"
                 Content="&#xf04b;"
                 Click="btnMenu_Click"
                 Style="{StaticResource buttonStyleMenuIcon}"
-                CommandParameter="Instances"
-                VerticalAlignment="Top" />
+                VerticalAlignment="Top">
+                <local:Extensions.Popup>
+                    <Popup Width="150" Placement="Right" StaysOpen="False">
+                        <StackPanel Background="#3a3935">
+                            <Label Content="Launcher" Style="{StaticResource subMenuHeader}" />
+                            <Button Name="btnMenuLauncherInstances" CommandParameter="btnMenuLauncher,Instances" Content="Instances" Style="{StaticResource subMenuButton}" Click="btnMenu_Click" />
+                            <Button Name="btnMenuLauncherTemplates" CommandParameter="btnMenuLauncher,Templates" Content="Templates" Style="{StaticResource subMenuButton}" Click="btnMenu_Click" />
+                        </StackPanel>
+                    </Popup>
+                </local:Extensions.Popup>
+            </Button>
             <Button
                 Name="btnMenuGitHub"
                 Content="&#xf09b;"
@@ -60,17 +82,9 @@
                 CommandParameter="GitHub Versions"
                 VerticalAlignment="Top" />
             <Button
-                Name="btnMenuTemplates"
-                Content="&#xf0c5;"
-                Margin="0,130,0,0"
-                Click="btnMenu_Click"
-                Style="{StaticResource buttonStyleMenuIcon}"
-                CommandParameter="Templates"
-                VerticalAlignment="Top" />
-            <Button
                 Name="btnMenuPackage"
                 Content="&#xf1b2;"
-                Margin="0,195,0,0"
+                Margin="0,130,0,0"
                 Click="btnMenu_Click"
                 Style="{StaticResource buttonStyleMenuIcon}"
                 CommandParameter="Package"
@@ -78,7 +92,7 @@
             <Button
                 Name="btnMenuSettings"
                 Content="&#xf013;"
-                Margin="0,260,0,0"
+                Margin="0,195,0,0"
                 Click="btnMenu_Click"
                 Style="{StaticResource buttonStyleMenuIcon}"
                 CommandParameter="Settings"
