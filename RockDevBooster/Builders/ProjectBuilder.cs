@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace com.blueboxmoon.RockDevBooster
+namespace com.blueboxmoon.RockDevBooster.Builders
 {
     public class ProjectBuilder
     {
@@ -68,7 +68,7 @@ namespace com.blueboxmoon.RockDevBooster
             //
             // Execute 'nuget.exe restore' in the solution directory.
             //
-            var process = new ConsoleApp( Path.Combine( Environment.CurrentDirectory, "nuget.exe" ) )
+            var process = new Utilities.ConsoleApp( Path.Combine( Environment.CurrentDirectory, "nuget.exe" ) )
             {
                 WorkingDirectory = projectPath
             };
@@ -116,7 +116,7 @@ namespace com.blueboxmoon.RockDevBooster
             // Launch a new devenv.com process to build the solution.
             //
             UpdateStatusText( "Building..." );
-            var process = new ConsoleApp( msbuild );
+            var process = new Utilities.ConsoleApp( msbuild );
             process.StandardTextReceived += Console_StandardTextReceived;
             process.ErrorTextReceived += Console_StandardTextReceived;
             process.WorkingDirectory = Path.GetDirectoryName( projectFile );

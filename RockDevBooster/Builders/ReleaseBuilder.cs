@@ -9,7 +9,7 @@ using System.Xml;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 
-namespace com.blueboxmoon.RockDevBooster
+namespace com.blueboxmoon.RockDevBooster.Builders
 {
     public class ReleaseBuilder
     {
@@ -166,7 +166,7 @@ namespace com.blueboxmoon.RockDevBooster
             // Launch a new devenv.com process to build the solution.
             //
             UpdateStatusText( "Building..." );
-            var process = new ConsoleApp( DevEnvExecutable );
+            var process = new Utilities.ConsoleApp( DevEnvExecutable );
             process.StandardTextReceived += Console_StandardTextReceived;
             process.WorkingDirectory = Support.GetBuildPath();
             process.ExecuteAsync( "Rock.sln", "/Build" );
@@ -227,7 +227,7 @@ namespace com.blueboxmoon.RockDevBooster
             //
             // Execute 'nuget.exe restore' in the solution directory.
             //
-            var process = new ConsoleApp( Path.Combine( Environment.CurrentDirectory, "nuget.exe" ) )
+            var process = new Utilities.ConsoleApp( Path.Combine( Environment.CurrentDirectory, "nuget.exe" ) )
             {
                 WorkingDirectory = Support.GetBuildPath()
             };

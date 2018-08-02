@@ -21,7 +21,7 @@ namespace com.blueboxmoon.RockDevBooster.Views
         /// <summary>
         /// The ReleaseBuilder object that we are using to build a release.
         /// </summary>
-        protected ReleaseBuilder ReleaseBuilder { get; set; }
+        protected Builders.ReleaseBuilder ReleaseBuilder { get; set; }
 
         protected List<GitHubItem> GitHubTags { get; set; }
 
@@ -176,7 +176,7 @@ namespace com.blueboxmoon.RockDevBooster.Views
             //
             // Initialize a new release builder to process this import operation.
             //
-            ReleaseBuilder = new ReleaseBuilder();
+            ReleaseBuilder = new Builders.ReleaseBuilder();
             ReleaseBuilder.StatusTextChanged += ReleaseBuilder_StatusTextChanged;
             ReleaseBuilder.ConsoleOutput += ReleaseBuilder_ConsoleOutput;
             ReleaseBuilder.BuildCompleted += ReleaseBuilder_BuildCompleted;

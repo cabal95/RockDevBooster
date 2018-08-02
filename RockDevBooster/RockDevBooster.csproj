@@ -82,16 +82,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ConsoleApp.cs" />
+    <Compile Include="Utilities\ConsoleApp.cs" />
     <Compile Include="Dialogs\PendingUpdateDialog.xaml.cs">
       <DependentUpon>PendingUpdateDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\TextInputDialog.xaml.cs">
       <DependentUpon>TextInputDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Extensions.cs" />
+    <Compile Include="Views\Extensions.cs" />
     <Compile Include="IViewDidShow.cs" />
-    <Compile Include="PluginBuilder.cs" />
+    <Compile Include="Builders\PluginBuilder.cs" />
     <Compile Include="Views\BuildPluginView.xaml.cs">
       <DependentUpon>BuildPluginView.xaml</DependentUpon>
     </Compile>
@@ -101,8 +101,8 @@
     <Compile Include="Views\SetupPluginLinksView.xaml.cs">
       <DependentUpon>SetupPluginLinksView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ProjectBuilder.cs" />
-    <Compile Include="ReleaseBuilder.cs" />
+    <Compile Include="Builders\ProjectBuilder.cs" />
+    <Compile Include="Builders\ReleaseBuilder.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="StatusEventArgs.cs" />
     <Compile Include="Support.cs" />
@@ -113,7 +113,7 @@
       <DependentUpon>TemplatesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="VisualStudioInstall.cs" />
-    <Compile Include="WindowPlacement.cs" />
+    <Compile Include="Utilities\WindowPlacement.cs" />
     <Page Include="Dialogs\PendingUpdateDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -215,5 +215,6 @@
       <Name>SetupLinks</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

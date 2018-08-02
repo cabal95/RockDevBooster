@@ -68,7 +68,7 @@
                 Click="btnMenu_Click"
                 Style="{StaticResource buttonStyleMenuIcon}"
                 VerticalAlignment="Top">
-                <local:Extensions.Popup>
+                <views:Extensions.Popup>
                     <Popup Width="150" Placement="Right" StaysOpen="False">
                         <StackPanel Background="#3a3935">
                             <Label Content="Launcher" Style="{StaticResource subMenuHeader}" />
@@ -77,7 +77,7 @@
                             <Label />
                         </StackPanel>
                     </Popup>
-                </local:Extensions.Popup>
+                </views:Extensions.Popup>
             </Button>
             <Button
                 Name="btnMenuGitHub"
@@ -94,7 +94,7 @@
                 Click="btnMenu_Click"
                 Style="{StaticResource buttonStyleMenuIcon}"
                 VerticalAlignment="Top">
-                <local:Extensions.Popup>
+                <views:Extensions.Popup>
                     <Popup Width="150" Placement="Right" StaysOpen="False">
                         <StackPanel Background="#3a3935">
                             <Label Content="Plugins" Style="{StaticResource subMenuHeader}" />
@@ -103,7 +103,7 @@
                             <Label />
                         </StackPanel>
                     </Popup>
-                </local:Extensions.Popup>
+                </views:Extensions.Popup>
             </Button>
             <Button
                 Name="btnMenuSettings"

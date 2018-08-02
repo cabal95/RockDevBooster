@@ -6,7 +6,7 @@ using System.Xml;
 using System.Xml.Serialization;
 
 // Taken from https://blogs.msdn.microsoft.com/davidrickard/2010/03/08/saving-window-size-and-location-in-wpf-and-winforms/
-namespace com.blueboxmoon.RockDevBooster
+namespace com.blueboxmoon.RockDevBooster.Utilities
 {
     // RECT structure required by WINDOWPLACEMENT structure
     [Serializable]

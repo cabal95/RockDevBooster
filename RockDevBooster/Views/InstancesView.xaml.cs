@@ -27,7 +27,7 @@ namespace com.blueboxmoon.RockDevBooster.Views
         /// <summary>
         /// Identifies the currently executing IIS Express process.
         /// </summary>
-        private ConsoleApp iisExpressProcess = null;
+        private Utilities.ConsoleApp iisExpressProcess = null;
 
         /// <summary>
         /// Identifies the SQL Server Local DB instance that we are running.
@@ -337,7 +337,7 @@ namespace com.blueboxmoon.RockDevBooster.Views
                 //
                 // Launch the IIS Express process for this RockWeb.
                 //
-                iisExpressProcess = new ConsoleApp( GetIisExecutable() );
+                iisExpressProcess = new Utilities.ConsoleApp( GetIisExecutable() );
                 iisExpressProcess.ProcessExited += IisExpressProcess_Exited;
                 iisExpressProcess.StandardTextReceived += IisExpressProcess_StandardTextReceived;
                 iisExpressProcess.ExecuteAsync( String.Format( "/path:{0}", path ), String.Format( "/port:{0}", port ) );

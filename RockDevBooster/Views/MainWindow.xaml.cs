@@ -106,7 +106,7 @@ namespace com.blueboxmoon.RockDevBooster.Views
         /// <param name="e">A <see cref="T:System.ComponentModel.CancelEventArgs" /> that contains the event data.</param>
         protected override void OnClosing( CancelEventArgs e )
         {
-            Settings.Default.MainWindowPlacement = WindowPlacement.GetPlacement( new WindowInteropHelper( this ).Handle );
+            Settings.Default.MainWindowPlacement = Utilities.WindowPlacement.GetPlacement( new WindowInteropHelper( this ).Handle );
             Settings.Default.Save();
         }
 
@@ -117,7 +117,7 @@ namespace com.blueboxmoon.RockDevBooster.Views
         protected override void OnSourceInitialized( EventArgs e )
         {
             base.OnSourceInitialized( e );
-            WindowPlacement.SetPlacement( new WindowInteropHelper( this ).Handle, Settings.Default.MainWindowPlacement );
+            Utilities.WindowPlacement.SetPlacement( new WindowInteropHelper( this ).Handle, Settings.Default.MainWindowPlacement );
         }
 
         /// <summary>

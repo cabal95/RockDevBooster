@@ -81,7 +81,7 @@ namespace com.blueboxmoon.RockDevBooster.Views
                     //
                     // Initialize a new release builder to process this import operation.
                     //
-                    var projectBuilder = new ProjectBuilder();
+                    var projectBuilder = new Builders.ProjectBuilder();
                     projectBuilder.StatusTextChanged += ReleaseBuilder_StatusTextChanged;
                     projectBuilder.ConsoleOutput += ProjectBuilder_ConsoleOutput;
 
@@ -93,9 +93,9 @@ namespace com.blueboxmoon.RockDevBooster.Views
 
                 Dispatcher.Invoke( () => { txtStatus.Text = "Packaging..."; } );
 
-                var builder = new PluginBuilder( Plugin, PluginPath );
-                builder.LogMessage += ProjectBuilder_ConsoleOutput;
-                var stream = builder.Build();
+                var pluginBuilder = new Builders.PluginBuilder( Plugin, PluginPath );
+                pluginBuilder.LogMessage += ProjectBuilder_ConsoleOutput;
+                var stream = pluginBuilder.Build();
 
                 Dispatcher.Invoke( () =>
                 {
