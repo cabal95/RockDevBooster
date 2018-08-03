@@ -51,6 +51,11 @@
                     <views:SetupPluginLinksView/>
                 </Grid>
             </TabItem>
+            <TabItem Header="Scripts">
+                <Grid Background="#dbd5cb">
+                    <views:ScriptsView/>
+                </Grid>
+            </TabItem>
             <TabItem Header="Settings">
                 <Grid Background="#dbd5cb">
                     <views:PreferencesView/>
@@ -74,6 +79,7 @@
                             <Label Content="Launcher" Style="{StaticResource subMenuHeader}" />
                             <Button Name="btnMenuLauncherInstances" CommandParameter="btnMenuLauncher,Instances" Content="Instances" Style="{StaticResource subMenuButton}" Click="btnMenu_Click" />
                             <Button CommandParameter="btnMenuLauncher,Templates" Content="Templates" Style="{StaticResource subMenuButton}" Click="btnMenu_Click" />
+                            <Button CommandParameter="btnMenuLauncher,Scripts" Content="Scripts" Style="{StaticResource subMenuButton}" Click="btnMenu_Click" />
                             <Label />
                         </StackPanel>
                     </Popup>

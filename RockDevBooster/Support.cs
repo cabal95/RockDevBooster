@@ -106,6 +106,23 @@ namespace com.blueboxmoon.RockDevBooster
             return instancesPath;
         }
 
+        /// <summary>
+        /// Get the path to the scripts.
+        /// </summary>
+        /// <returns>A string representing a location on the filesystem.</returns>
+        static public string GetScriptsPath()
+        {
+            string dataPath = GetDataPath();
+            string scriptsPath = Path.Combine( dataPath, "Scripts" );
+
+            if ( !Directory.Exists( scriptsPath ) )
+            {
+                Directory.CreateDirectory( scriptsPath );
+            }
+
+            return scriptsPath;
+        }
+
         #endregion
 
         #region Archival Methods

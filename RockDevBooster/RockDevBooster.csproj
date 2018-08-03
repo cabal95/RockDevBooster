@@ -44,6 +44,9 @@
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="Jint, Version=0.0.0.0, Culture=neutral, PublicKeyToken=2e92ba9c8d81157f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Jint.2.11.58\lib\net451\Jint.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.Setup.Configuration.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.VisualStudio.Setup.Configuration.Interop.1.15.103\lib\net35\Microsoft.VisualStudio.Setup.Configuration.Interop.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -82,12 +85,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Bootstrap\Bootstrapper.cs" />
+    <Compile Include="Bootstrap\EngineTypeReference.cs" />
+    <Compile Include="Bootstrap\Objects\Instance.cs" />
+    <Compile Include="Bootstrap\MethodInfoEngineFunctionInstance.cs" />
+    <Compile Include="Bootstrap\Objects\Template.cs" />
     <Compile Include="Utilities\ConsoleApp.cs" />
     <Compile Include="Dialogs\PendingUpdateDialog.xaml.cs">
       <DependentUpon>PendingUpdateDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\TextInputDialog.xaml.cs">
       <DependentUpon>TextInputDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ScriptsView.xaml.cs">
+      <DependentUpon>ScriptsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Extensions.cs" />
     <Compile Include="IViewDidShow.cs" />
@@ -119,6 +130,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\TextInputDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ScriptsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

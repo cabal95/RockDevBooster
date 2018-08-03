@@ -30,14 +30,14 @@ namespace com.blueboxmoon.RockDevBooster.Views
         private Utilities.ConsoleApp iisExpressProcess = null;
 
         /// <summary>
+        /// The running instance name
+        /// </summary>
+        private string RunningInstanceName = null;
+
+        /// <summary>
         /// Identifies the SQL Server Local DB instance that we are running.
         /// </summary>
         private SqlLocalDbInstance localDb = null;
-
-        /// <summary>
-        /// Identifies the main instances view so we can refresh the state externally.
-        /// </summary>
-        static private InstancesView DefaultInstancesView = null;
 
         /// <summary>
         /// Template to be used when building the webConnectionString.config file.
@@ -49,6 +49,11 @@ namespace com.blueboxmoon.RockDevBooster.Views
 ";
 
         #endregion
+
+        /// <summary>
+        /// Identifies the main instances view so we can refresh the state externally.
+        /// </summary>
+        static public InstancesView DefaultInstancesView = null;
 
         #region Constructors
 
@@ -77,13 +82,16 @@ namespace com.blueboxmoon.RockDevBooster.Views
         /// </summary>
         static public void UpdateInstances()
         {
-            DefaultInstancesView.txtStatus.Text = "Loading...";
+            DefaultInstancesView.Dispatcher.Invoke( () =>
+            {
+                DefaultInstancesView.txtStatus.Text = "Loading...";
 
-            DefaultInstancesView.cbInstances.IsEnabled = false;
-            DefaultInstancesView.btnDelete.IsEnabled = false;
-            DefaultInstancesView.btnStartStop.IsEnabled = false;
-            DefaultInstancesView.btnMakeTemplate.IsEnabled = false;
-            DefaultInstancesView.txtPort.IsEnabled = false;
+                DefaultInstancesView.cbInstances.IsEnabled = false;
+                DefaultInstancesView.btnDelete.IsEnabled = false;
+                DefaultInstancesView.btnStartStop.IsEnabled = false;
+                DefaultInstancesView.btnMakeTemplate.IsEnabled = false;
+                DefaultInstancesView.txtPort.IsEnabled = false;
+            } );
 
             new Task( DefaultInstancesView.LoadData ).Start();
         }
@@ -97,36 +105,6 @@ namespace com.blueboxmoon.RockDevBooster.Views
         /// </summary>
         private void LoadData()
         {
-            //
-            // Initialize the LocalDb service only once.
-            //
-            if ( localDb == null )
-            {
-                var provider = new SqlLocalDbProvider();
-                SqlLocalDbInstance instance;
-
-                try
-                {
-                    //
-                    // If we find an existing instance then shut it down and delete it.
-                    //
-                    instance = provider.GetInstance( "RockDevBooster" );
-                    if ( instance.IsRunning )
-                    {
-                        instance.Stop();
-                    }
-                    SqlLocalDbInstance.Delete( instance );
-                }
-                finally
-                {
-                    //
-                    // Create a new instance and keep a reference to it.
-                    //
-                    localDb = provider.CreateInstance( "RockDevBooster" );
-                    localDb.Start();
-                }
-            }
-
             //
             // Load all the instances from the file system.
             //
@@ -171,7 +149,43 @@ namespace com.blueboxmoon.RockDevBooster.Views
                 {
                     cbInstances.SelectedIndex = 0;
                 }
+            } );
 
+            //
+            // Initialize the LocalDb service only once.
+            //
+            if ( localDb == null )
+            {
+                var provider = new SqlLocalDbProvider();
+                SqlLocalDbInstance instance;
+
+                try
+                {
+                    //
+                    // If we find an existing instance then shut it down and delete it.
+                    //
+                    instance = provider.GetInstance( "RockDevBooster" );
+                    if ( instance.IsRunning )
+                    {
+                        instance.Stop();
+                    }
+                    SqlLocalDbInstance.Delete( instance );
+                }
+                finally
+                {
+                    //
+                    // Create a new instance and keep a reference to it.
+                    //
+                    localDb = provider.CreateInstance( "RockDevBooster" );
+                    localDb.Start();
+                }
+            }
+
+            //
+            // Update the UI with the new list of instances.
+            //
+            Dispatcher.Invoke( () =>
+            {
                 txtStatus.Text = "Idle";
 
                 UpdateState();
@@ -187,7 +201,7 @@ namespace com.blueboxmoon.RockDevBooster.Views
         /// </summary>
         private void UpdateState()
         {
-            bool enableButtons = cbInstances.SelectedIndex != -1;
+            bool enableButtons = localDb != null && cbInstances.SelectedIndex != -1;
 
             btnStartStop.IsEnabled = enableButtons;
             btnDelete.IsEnabled = enableButtons && iisExpressProcess == null;
@@ -250,6 +264,162 @@ namespace com.blueboxmoon.RockDevBooster.Views
         }
         #endregion
 
+        #region Public Methods
+
+        /// <summary>
+        /// Starts the instance.
+        /// </summary>
+        /// <param name="instanceName">Name of the instance.</param>
+        /// <exception cref="Exception">
+        /// There is an instance already running.
+        /// or
+        /// </exception>
+        public void StartInstance( string instanceName, int port )
+        {
+            int instanceIndex = -1;
+
+            if ( iisExpressProcess != null )
+            {
+                throw new Exception( "There is an instance already running." );
+            }
+
+            Dispatcher.Invoke( () =>
+            {
+                txtStatus.Text = "Starting...";
+                txtConsole.Text = string.Empty;
+
+                var items = ( List<string> ) cbInstances.ItemsSource;
+                instanceIndex = items.IndexOf( instanceName );
+                if (instanceIndex != -1 )
+                {
+                    cbInstances.SelectedIndex = instanceIndex;
+                }
+
+                txtPort.Text = port.ToString();
+            } );
+
+            //
+            // Find the path to the RockWeb instance.
+            //
+            var path = Path.Combine( Support.GetInstancesPath(), instanceName, "RockWeb" );
+            if ( !Directory.Exists( path ) || instanceIndex == -1 )
+            {
+                throw new Exception( string.Format( "The instance '{0}' was not found.", instanceName ) );
+            }
+
+            //
+            // Check if the Database file already exists and if not create the
+            // Run.Migration file so Rock initializes itself.
+            //
+            var dbPath = Path.Combine( path, "App_Data", "Database.mdf" );
+            if ( !File.Exists( dbPath ) )
+            {
+                var runMigrationPath = Path.Combine( path, "App_Data", "Run.Migration" );
+                File.WriteAllText( runMigrationPath, string.Empty );
+            }
+
+            ConfigureConnectionString( path );
+
+            //
+            // Prepare the IIS Express process for this RockWeb.
+            //
+            iisExpressProcess = new Utilities.ConsoleApp( GetIisExecutable() );
+            iisExpressProcess.ProcessExited += IisExpressProcess_Exited;
+            iisExpressProcess.StandardTextReceived += IisExpressProcess_StandardTextReceived;
+            RunningInstanceName = instanceName;
+
+            //
+            // Update the status text to contain a clickable link to the instance.
+            //
+            Dispatcher.Invoke( () =>
+            {
+                var linkText = string.Format( "http://localhost:{0}/", port );
+                var link = new Hyperlink( new Run( linkText ) )
+                {
+                    NavigateUri = new Uri( linkText )
+                };
+                link.RequestNavigate += StatusLink_RequestNavigate;
+                txtStatus.Inlines.Clear();
+                txtStatus.Inlines.Add( new Run( "Running at " ) );
+                txtStatus.Inlines.Add( link );
+
+                UpdateState();
+            } );
+
+            //
+            // Launch IIS Express.
+            //
+            iisExpressProcess.ExecuteAsync( String.Format( "/path:{0}", path ), String.Format( "/port:{0}", port ) );
+        }
+
+        /// <summary>
+        /// Stops the instance.
+        /// </summary>
+        public void StopInstance()
+        {
+            if ( iisExpressProcess != null )
+            {
+                iisExpressProcess.Kill();
+                iisExpressProcess = null;
+            }
+
+            if ( RunningInstanceName != null )
+            {
+                try
+                {
+                    using ( var connection = localDb.CreateConnection() )
+                    {
+                        connection.Open();
+
+                        //
+                        // Shrink the log file.
+                        //
+                        connection.ChangeDatabase( RunningInstanceName );
+                        var cmd = connection.CreateCommand();
+                        cmd.CommandText = "DBCC SHRINKFILE ([Database_log.ldf], 1)";
+                        cmd.ExecuteNonQuery();
+
+                        //
+                        // Detach the database.
+                        //
+                        connection.ChangeDatabase( "master" );
+                        cmd = connection.CreateCommand();
+                        cmd.CommandText = string.Format( "exec sp_detach_db [{0}]", RunningInstanceName );
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                catch
+                {
+                    /* Intentionally left blank */
+                }
+
+                RunningInstanceName = null;
+            }
+
+            Dispatcher.Invoke( () =>
+            {
+                txtStatus.Text = "Idle";
+                UpdateState();
+            } );
+        }
+
+        public System.Data.SqlClient.SqlConnection GetSqlConnection()
+        {
+            if ( RunningInstanceName == null )
+            {
+                return null;
+            }
+
+            var connection = localDb.CreateConnection();
+
+            connection.Open();
+            connection.ChangeDatabase( RunningInstanceName );
+
+            return connection;
+        }
+
+        #endregion
+
         #region Event Handlers
 
         /// <summary>
@@ -304,96 +474,23 @@ namespace com.blueboxmoon.RockDevBooster.Views
         {
             if ( btnStartStop.Content.ToString().EndsWith( "Start" ) )
             {
-                txtStatus.Text = "Starting...";
-                txtConsole.Text = string.Empty;
-
-                //
-                // Just in case something goes wrong and they managed to type in a non-numeric.
-                //
-                if ( !int.TryParse( txtPort.Text, out int port ) )
-                {
-                    port = 6229;
-                }
-
                 //
                 // Find the path to the RockWeb instance.
                 //
                 var items = ( List<string> ) cbInstances.ItemsSource;
-                var path = Path.Combine( Support.GetInstancesPath(), items[cbInstances.SelectedIndex], "RockWeb" );
+                string instanceName = items[cbInstances.SelectedIndex];
 
-                //
-                // Check if the Database file already exists and if not create the
-                // Run.Migration file so Rock initializes itself.
-                //
-                var dbPath = Path.Combine( path, "App_Data", "Database.mdf" );
-                if ( !File.Exists( dbPath ) )
+                int port = 6229;
+                if ( int.TryParse( txtPort.Text, out int p ) )
                 {
-                    var runMigrationPath = Path.Combine( path, "App_Data", "Run.Migration" );
-                    File.WriteAllText( runMigrationPath, string.Empty );
+                    port = p;
                 }
 
-                ConfigureConnectionString( path );
-
-                //
-                // Launch the IIS Express process for this RockWeb.
-                //
-                iisExpressProcess = new Utilities.ConsoleApp( GetIisExecutable() );
-                iisExpressProcess.ProcessExited += IisExpressProcess_Exited;
-                iisExpressProcess.StandardTextReceived += IisExpressProcess_StandardTextReceived;
-                iisExpressProcess.ExecuteAsync( String.Format( "/path:{0}", path ), String.Format( "/port:{0}", port ) );
-
-                //
-                // Update the status text to contain a clickable link to the instance.
-                //
-                var linkText = string.Format( "http://localhost:{0}/", port );
-                var link = new Hyperlink( new Run( linkText ) )
-                {
-                    NavigateUri = new Uri( linkText )
-                };
-                link.RequestNavigate += StatusLink_RequestNavigate;
-                txtStatus.Inlines.Clear();
-                txtStatus.Inlines.Add( new Run( "Running at " ) );
-                txtStatus.Inlines.Add( link );
+                StartInstance( instanceName, port );
             }
             else
             {
-                if ( iisExpressProcess != null )
-                {
-                    iisExpressProcess.Kill();
-                    iisExpressProcess = null;
-                }
-
-                try
-                {
-                    var items = ( List<string> ) cbInstances.ItemsSource;
-
-                    using ( var connection = localDb.CreateConnection() )
-                    {
-                        connection.Open();
-
-                        //
-                        // Shrink the log file.
-                        //
-                        connection.ChangeDatabase( items[cbInstances.SelectedIndex] );
-                        var cmd = connection.CreateCommand();
-                        cmd.CommandText = "DBCC SHRINKFILE ([Database_log.ldf], 1)";
-                        cmd.ExecuteNonQuery();
-
-                        //
-                        // Detach the database.
-                        //
-                        connection.ChangeDatabase( "master" );
-                        cmd = connection.CreateCommand();
-                        cmd.CommandText = string.Format( "exec sp_detach_db [{0}]", items[cbInstances.SelectedIndex] );
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-                catch
-                {
-                    /* Intentionally left blank */
-                }
-
-                txtStatus.Text = "Idle";
+                StopInstance();
             }
 
             UpdateState();

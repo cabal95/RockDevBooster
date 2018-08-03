@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Win32;
 
 namespace com.blueboxmoon.RockDevBooster.Views
 {
@@ -160,6 +161,8 @@ namespace com.blueboxmoon.RockDevBooster.Views
                      } );
                  } );
 
+                 InstancesView.UpdateInstances();
+
                  //
                  // Update the UI to indicate that it is deployed.
                  //
@@ -168,7 +171,6 @@ namespace com.blueboxmoon.RockDevBooster.Views
                      txtStatus.Text = "Deployed";
                      UpdateState();
 
-                     InstancesView.UpdateInstances();
                  } );
              } ).Start();
         }
@@ -196,5 +198,29 @@ namespace com.blueboxmoon.RockDevBooster.Views
         }
 
         #endregion
+
+        /// <summary>
+        /// Handles the Click event of the btnOpenScript control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.RoutedEventArgs" /> instance containing the event data.</param>
+        private void btnOpenScript_Click( object sender, RoutedEventArgs e )
+        {
+            //
+            // Ask for the user to select the plugin file.
+            //
+            var openFileDialog = new OpenFileDialog
+            {
+                DereferenceLinks = false,
+                Filter = "JavaScript (*.js)|*.js|All Files (*.*)|*.*"
+            };
+
+            if ( openFileDialog.ShowDialog() == false )
+            {
+                return;
+            }
+
+            txtScript.Text = openFileDialog.FileName;
+        }
     }
 }
