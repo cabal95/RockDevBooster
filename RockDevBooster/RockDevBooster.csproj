@@ -90,6 +90,9 @@
     <Compile Include="Bootstrap\Objects\Instance.cs" />
     <Compile Include="Bootstrap\MethodInfoEngineFunctionInstance.cs" />
     <Compile Include="Bootstrap\Objects\Template.cs" />
+    <Compile Include="Dialogs\ComboBoxInputDialog.xaml.cs">
+      <DependentUpon>ComboBoxInputDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utilities\ConsoleApp.cs" />
     <Compile Include="Dialogs\PendingUpdateDialog.xaml.cs">
       <DependentUpon>PendingUpdateDialog.xaml</DependentUpon>
@@ -125,6 +128,10 @@
     </Compile>
     <Compile Include="VisualStudioInstall.cs" />
     <Compile Include="Utilities\WindowPlacement.cs" />
+    <Page Include="Dialogs\ComboBoxInputDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\PendingUpdateDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -30,11 +30,6 @@ namespace com.blueboxmoon.RockDevBooster.Views
         private Utilities.ConsoleApp iisExpressProcess = null;
 
         /// <summary>
-        /// The running instance name
-        /// </summary>
-        private string RunningInstanceName = null;
-
-        /// <summary>
         /// Identifies the SQL Server Local DB instance that we are running.
         /// </summary>
         private SqlLocalDbInstance localDb = null;
@@ -50,10 +45,19 @@ namespace com.blueboxmoon.RockDevBooster.Views
 
         #endregion
 
+        #region Plublic Properties
+
         /// <summary>
         /// Identifies the main instances view so we can refresh the state externally.
         /// </summary>
-        static public InstancesView DefaultInstancesView = null;
+        static public InstancesView DefaultInstancesView { get; set; }
+
+        /// <summary>
+        /// The running instance name
+        /// </summary>
+        static public string RunningInstanceName { get; private set; }
+
+        #endregion
 
         #region Constructors
 
@@ -403,6 +407,10 @@ namespace com.blueboxmoon.RockDevBooster.Views
             } );
         }
 
+        /// <summary>
+        /// Gets the SQL connection to the running instance.
+        /// </summary>
+        /// <returns></returns>
         public System.Data.SqlClient.SqlConnection GetSqlConnection()
         {
             if ( RunningInstanceName == null )

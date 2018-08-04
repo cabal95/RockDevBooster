@@ -11,6 +11,8 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap.Objects
     /// </summary>
     public class Template
     {
+        #region Properties
+
         /// <summary>
         /// Gets or sets the engine.
         /// </summary>
@@ -25,7 +27,11 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap.Objects
         /// <value>
         /// The name of the template.
         /// </value>
-        private string Name { get; set; }
+        public string Name { get; private set; }
+
+        #endregion
+
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Template"/> class.
@@ -37,6 +43,10 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap.Objects
             Engine = engine;
             Name = name;
         }
+
+        #endregion
+
+        #region Static Methods
 
         /// <summary>
         /// Retrieves the names of all templates in the system.
@@ -61,6 +71,46 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap.Objects
 
             return File.Exists( zipfile );
         }
+
+        /// <summary>
+        /// Prompts the user to select a template.
+        /// </summary>
+        /// <param name="engine">The engine.</param>
+        /// <returns>A template or null if the user cancelled.</returns>
+        public static Template Prompt( Engine engine, string title )
+        {
+            string templateName = null;
+            var templates = All().ToList();
+
+            System.Windows.Application.Current.Dispatcher.Invoke( () =>
+            {
+                var dialog = new Dialogs.ComboBoxInputDialog( null, title ?? "Select Template" )
+                {
+                    Items = templates,
+                    Required = true
+                };
+
+                if ( dialog.ShowDialog() == false )
+                {
+                    templateName = null;
+                }
+                else
+                {
+                    templateName = dialog.SelectedValue;
+                }
+            } );
+
+            if ( templateName == null )
+            {
+                return null;
+            }
+
+            return new Template( engine, templateName );
+        }
+
+        #endregion
+
+        #region Public Methods
 
         /// <summary>
         /// Deploys the template to the named instance.
@@ -92,5 +142,7 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap.Objects
 
             return new Instance( Engine, instanceName );
         }
+
+        #endregion
     }
 }
