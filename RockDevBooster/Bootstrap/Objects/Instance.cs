@@ -138,6 +138,37 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap.Objects
 
         #endregion
 
+        #region Protected Methods
+
+        /// <summary>
+        /// Gets the results from command.
+        /// </summary>
+        /// <param name="command">The command.</param>
+        /// <returns></returns>
+        protected List<Dictionary<string, object>> GetResultsFromCommand( System.Data.SqlClient.SqlCommand command )
+        {
+            using ( var reader = command.ExecuteReader() )
+            {
+                var results = new List<Dictionary<string, object>>();
+
+                while ( reader.Read() )
+                {
+                    var row = new Dictionary<string, object>();
+
+                    for ( int i = 0; i < reader.FieldCount; i++ )
+                    {
+                        row.Add( reader.GetName( i ), reader[i] );
+                    }
+
+                    results.Add( row );
+                }
+
+                return results;
+            }
+        }
+
+        #endregion
+
         #region Public Methods
 
         /// <summary>
@@ -332,24 +363,80 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap.Objects
                 var command = connection.CreateCommand();
                 command.CommandText = sql;
 
-                using ( var reader = command.ExecuteReader() )
+                return GetResultsFromCommand( command ).ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Determines whether any migration exceptions have occurred since the script started.
+        /// </summary>
+        /// <returns>
+        ///   <c>true</c> if any migration exceptions have occurred; otherwise, <c>false</c>.
+        /// </returns>
+        public bool HasRecentMigrationExceptions()
+        {
+            return HasRecentMigrationExceptions( false );
+        }
+
+        /// <summary>
+        /// Determines whether any migration exceptions have occurred since the script started.
+        /// </summary>
+        /// <param name="logExceptions">if set to <c>true</c> the exceptions should be logged.</param>
+        /// <returns>
+        ///   <c>true</c> if any migration exceptions have occurred; otherwise, <c>false</c>.
+        /// </returns>
+        public bool HasRecentMigrationExceptions( bool logExceptions )
+        {
+            var bootstrap = ( Bootstrapper ) ( ( Jint.Runtime.Interop.ObjectWrapper ) Engine.GetValue( "__Bootstrap" ).AsObject() ).Target;
+            //            bootstrap.Log( message );
+
+            //
+            // Get any recent exceptions.
+            //
+            using ( var connection = Views.InstancesView.DefaultInstancesView.GetSqlConnection() )
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = @"SELECT [Id],[HasInnerException],[Description]
+FROM [ExceptionLog]
+WHERE [CreatedDateTime] >= @LimitDate
+  AND [Description] LIKE 'Plugin Migration error%'";
+                command.Parameters.AddWithValue( "LimitDate", bootstrap.ExecuteStartedDateTime );
+
+                var baseExceptions = GetResultsFromCommand( command );
+
+                //
+                // If requested, log the exceptions.
+                //
+                if ( logExceptions )
                 {
-                    var results = new List<Dictionary<string, object>>();
-
-                    while ( reader.Read() )
+                    foreach ( var exception in baseExceptions )
                     {
-                        var row = new Dictionary<string, object>();
+                        var data = exception;
 
-                        for ( int i = 0; i < reader.FieldCount; i++ )
+                        while ( data != null )
                         {
-                            row.Add( reader.GetName( i ), reader[i] );
+                            bootstrap.Log( data["Description"] );
+
+                            if ( ( bool ) data["HasInnerException"] )
+                            {
+                                using ( var cmd = connection.CreateCommand() )
+                                {
+                                    cmd.CommandText = @"SELECT TOP 1 [Id],[HasInnerException],[Description] FROM [ExceptionLog] WHERE [ParentId] = @Id";
+                                    cmd.Parameters.AddWithValue( "Id", data["Id"] );
+
+                                    var dataItems = GetResultsFromCommand( cmd );
+                                    data = dataItems.Any() ? dataItems[0] : null;
+                                }
+                            }
+                            else
+                            {
+                                data = null;
+                            }
                         }
-
-                        results.Add( row );
                     }
-
-                    return results.ToArray();
                 }
+
+                return baseExceptions.Any();
             }
         }
 
