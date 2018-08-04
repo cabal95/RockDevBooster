@@ -12,29 +12,46 @@
             Margin="10,10,0,0"
             Content="Build With"
             VerticalAlignment="Top"
-            Width="75"
-            Style="{StaticResource labelStyleBold}" Grid.RowSpan="2"
+            Width="102"
+            Style="{StaticResource labelStyleBold}"
             />
-        <ComboBox Name="cbVisualStudio" Margin="90,10,10,0" VerticalAlignment="Top" SelectionChanged="cbVisualStudio_SelectionChanged" Grid.RowSpan="2"/>
+        <ComboBox Name="cbVisualStudio" Margin="117,10,10,0" VerticalAlignment="Top" SelectionChanged="cbVisualStudio_SelectionChanged"/>
 
+        <Label
+            HorizontalAlignment="Left"
+            Margin="10,36,0,0"
+            Content="Update Check"
+            VerticalAlignment="Top"
+            Width="102"
+            Style="{StaticResource labelStyleBold}"
+            />
         <CheckBox Name="cbAutoUpdate"
                   Style="{StaticResource checkboxStyle}"
-                  Content="Auto Update"
-                  Margin="90,37,10,0"
+                  Content=""
+                  Margin="117,37,105,0"
                   VerticalAlignment="Top"
+                  VerticalContentAlignment="Center"
                   Checked="cbAutoUpdate_Changed"
                   Unchecked="cbAutoUpdate_Changed"
                   />
 
         <Button Name="btnCheckForUpdates"
-                Content="Check For Updates"
-                Margin="0,0,10,10"
+                Content="Check Now"
+                Margin="0,37,10,0"
                 HorizontalAlignment="Right"
-                Width="130"
+                Width="90"
                 Click="btnCheckForUpdates_Click"
-                IsDefault="True"
-                Style="{StaticResource buttonStyleAction}"
-                Height="36"
-                VerticalAlignment="Bottom"/>
+                IsDefault="False"
+                Style="{StaticResource buttonStyleMiniAction}"
+                VerticalAlignment="Top"/>
+        <Button Name="btnOpenDataFolder"
+            Content="Open Data Folder"
+            Margin="0,0,10,10"
+            HorizontalAlignment="Right"
+            Width="120"
+            Click="btnOpenDataFolder_Click"
+            IsDefault="False"
+            Style="{StaticResource buttonStyleAction}"
+            VerticalAlignment="Bottom"/>
     </Grid>
 </UserControl>

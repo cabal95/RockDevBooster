@@ -154,6 +154,16 @@ namespace com.blueboxmoon.RockDevBooster.Views
             Settings.Default.Save();
         }
 
+        /// <summary>
+        /// Handles the Click event of the btnOpenDataFolder control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        private void btnOpenDataFolder_Click( object sender, RoutedEventArgs e )
+        {
+            Process.Start( Support.GetDataPath() );
+        }
+
         #endregion
     }
 }
