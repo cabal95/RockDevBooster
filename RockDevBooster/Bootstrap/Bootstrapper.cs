@@ -17,6 +17,14 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap
         /// </summary>
         public event EventHandler<string> LogMessage;
 
+        /// <summary>
+        /// Gets or sets the execute started date time.
+        /// </summary>
+        /// <value>
+        /// The execute started date time.
+        /// </value>
+        public DateTime ExecuteStartedDateTime { get; private set; }
+
         #endregion
 
         #region Javascript Methods
@@ -55,6 +63,14 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap
             throw new EngineAbortException();
         }
 
+        /// <summary>
+        /// Beeps the computer.
+        /// </summary>
+        protected void Beep()
+        {
+            System.Media.SystemSounds.Beep.Play();
+        }
+
         #endregion
 
         /// <summary>
@@ -64,6 +80,8 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap
         public void Execute( string script )
         {
             var engine = new Engine();
+
+            ExecuteStartedDateTime = DateTime.Now;
 
             //
             // Add in this object for specialized use by other methods that
@@ -83,6 +101,7 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap
             engine.SetValue( "Log", new Action<object>( Log ) );
             engine.SetValue( "LogProgress", new Action<object>( LogProgress ) );
             engine.SetValue( "Abort", new Action<object>( Abort ) );
+            engine.SetValue( "Beep", new Action( Beep ) );
 
             try
             {
