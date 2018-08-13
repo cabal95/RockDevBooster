@@ -50,6 +50,8 @@ namespace com.blueboxmoon.RockDevBooster.Views
         /// </summary>
         protected void UpdateState()
         {
+            btnSelect.IsEnabled = true;
+
             if ( Plugin != null )
             {
                 lSelectedPlugin.Content = string.Format( "{0} by {1}", Plugin.Name, Plugin.Organization );
@@ -121,7 +123,7 @@ namespace com.blueboxmoon.RockDevBooster.Views
                         return;
                     }
 
-                    using ( var writer = File.Open( saveFileDialog.FileName, FileMode.Truncate ) )
+                    using ( var writer = File.Open( saveFileDialog.FileName, FileMode.Create ) )
                     {
                         stream.CopyTo( writer );
                     }
