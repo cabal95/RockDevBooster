@@ -167,6 +167,89 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap.Objects
             }
         }
 
+        /// <summary>
+        /// Resolves the instance path.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns></returns>
+        protected string ResolveInstancePath( string path )
+        {
+            if ( !path.StartsWith( "~" ) )
+            {
+                return path;
+            }
+
+            if ( path.StartsWith( @"~\" ) )
+            {
+                path = path.Substring( 2 );
+            }
+            else
+            {
+                path = path.Substring( 1 );
+            }
+
+            return Path.Combine( Support.GetInstancesPath(), Name, "RockWeb", path );
+        }
+
+        /// <summary>
+        /// Simplifies the instance path by replacing the instance RockWeb path with ~.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns></returns>
+        protected string SimplifyInstancePath( string path )
+        {
+            string instancePath = Path.Combine( Support.GetInstancesPath(), Name, "RockWeb" );
+
+            return path.Replace( instancePath, "~" );
+        }
+
+        /// <summary>
+        /// Directories the copy.
+        /// </summary>
+        /// <param name="sourceDirName">Name of the source dir.</param>
+        /// <param name="destDirName">Name of the dest dir.</param>
+        /// <exception cref="DirectoryNotFoundException"></exception>
+        protected void DirectoryCopy( string sourceDirName, string destDirName, Action<string, string> logger = null )
+        {
+            //
+            // Get the subdirectories for the specified directory.
+            //
+            DirectoryInfo dir = new DirectoryInfo( sourceDirName );
+
+            if ( !dir.Exists )
+            {
+                throw new DirectoryNotFoundException( $"Source directory '{ sourceDirName }' does not exist or could not be found." );
+            }
+
+            //
+            // If the destination directory doesn't exist, create it.
+            //
+            if ( !Directory.Exists( destDirName ) )
+            {
+                Directory.CreateDirectory( destDirName );
+            }
+
+            //
+            // Get the files in the directory and copy them to the new location.
+            //
+            FileInfo[] files = dir.GetFiles();
+            foreach ( FileInfo file in files )
+            {
+                string temppath = Path.Combine( destDirName, file.Name );
+                file.CopyTo( temppath, false );
+                logger( file.FullName, temppath );
+            }
+
+            //
+            // Get the sub directories and copy them to the new location.
+            //
+            DirectoryInfo[] dirs = dir.GetDirectories();
+            foreach ( DirectoryInfo subdir in dirs )
+            {
+                DirectoryCopy( subdir.FullName, Path.Combine( destDirName, subdir.Name ), logger );
+            }
+        }
+
         #endregion
 
         #region Public Methods
@@ -303,6 +386,145 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap.Objects
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Copies a file into the RockWeb folder.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="destination">The destination.</param>
+        public void CopyFile( string source, string destination )
+        {
+            CopyFile( source, destination, false );
+        }
+
+        /// <summary>
+        /// Copies a file into the RockWeb folder.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="destination">The destination.</param>
+        /// <param name="verbose">if set to <c>true</c> [verbose].</param>
+        public void CopyFile( string source, string destination, bool verbose )
+        {
+            source = source.Replace( '/', '\\' );
+            destination = destination.Replace( '/', '\\' );
+
+            if ( destination.Contains( ".." ) )
+            {
+                throw new ArgumentException( "Destination cannot include '..' in the path.", "destination" );
+            }
+
+            if ( !destination.StartsWith( @"~\" ) )
+            {
+                throw new ArgumentException( "Destination must begin with '~\\'.", "destination" );
+            }
+
+            source = ResolveInstancePath( source );
+            destination = ResolveInstancePath( destination );
+
+            if ( File.Exists( destination ) || Directory.Exists( destination ) )
+            {
+                throw new Exception( $"Destination '{destination}' already exists." );
+            }
+
+            Action<string, string> logger = delegate ( string src, string dest )
+            {
+                if ( verbose )
+                {
+                    var bootstrap = ( Bootstrapper ) ( ( Jint.Runtime.Interop.ObjectWrapper ) Engine.GetValue( "__Bootstrap" ).AsObject() ).Target;
+                    bootstrap.Log( $"Copied '{SimplifyInstancePath( src )}' to '{SimplifyInstancePath( dest )}'." );
+                }
+            };
+
+            if ( File.Exists( source ) )
+            {
+                File.Copy( source, destination );
+                logger( source, destination );
+            }
+            else
+            {
+                DirectoryCopy( source, destination, logger );
+            }
+        }
+
+        /// <summary>
+        /// Deletes the file.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        public void DeleteFile( string path )
+        {
+            DeleteFile( path, false );
+        }
+
+        /// <summary>
+        /// Deletes the file.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <param name="verbose">if set to <c>true</c> [verbose].</param>
+        public void DeleteFile( string path, bool verbose )
+        {
+            path = path.Replace( '/', '\\' );
+
+            if ( path.Contains( ".." ) )
+            {
+                throw new ArgumentException( "Destination cannot include '..' in the path.", "path" );
+            }
+
+            if ( !path.StartsWith( @"~\" ) )
+            {
+                throw new ArgumentException( "Destination must begin with '~\\'.", "path" );
+            }
+
+            var fullPath = ResolveInstancePath( path );
+
+            if ( File.Exists( fullPath ) )
+            {
+                File.Delete( fullPath );
+
+                if ( verbose )
+                {
+                    var bootstrap = ( Bootstrapper ) ( ( Jint.Runtime.Interop.ObjectWrapper ) Engine.GetValue( "__Bootstrap" ).AsObject() ).Target;
+                    bootstrap.Log( $"Deleted file '{ SimplifyInstancePath( fullPath ) }'." );
+                }
+            }
+            else if ( Directory.Exists( fullPath ) )
+            {
+                Directory.Delete( fullPath, true );
+
+                if ( verbose )
+                {
+                    var bootstrap = ( Bootstrapper ) ( ( Jint.Runtime.Interop.ObjectWrapper ) Engine.GetValue( "__Bootstrap" ).AsObject() ).Target;
+                    bootstrap.Log( $"Deleted directory '{ SimplifyInstancePath( fullPath ) }'." );
+                }
+            }
+            else
+            {
+                throw new FileNotFoundException( $"Path '{ path }' does not exist." );
+            }
+        }
+
+        /// <summary>
+        /// Checks if the file the exists.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns></returns>
+        public bool FileExists( string path )
+        {
+            path = path.Replace( '/', '\\' );
+
+            return File.Exists( ResolveInstancePath( path ) );
+        }
+
+        /// <summary>
+        /// Checks if the directory the exists.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns></returns>
+        public bool DirectoryExists( string path )
+        {
+            path = path.Replace( '/', '\\' );
+
+            return File.Exists( ResolveInstancePath( path ) );
         }
 
         /// <summary>
