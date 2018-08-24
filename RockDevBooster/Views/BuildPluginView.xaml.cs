@@ -224,7 +224,7 @@ namespace com.blueboxmoon.RockDevBooster.Views
             //
             try
             {
-                var pluginJson = File.ReadAllText( Path.Combine( PluginPath, "rockplugin.json" ) );
+                var pluginJson = File.ReadAllText( openFileDialog.FileName );
                 Plugin = JsonConvert.DeserializeObject<Plugin>( pluginJson );
                 Plugin.ConfigureDefaults();
             }

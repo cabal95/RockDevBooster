@@ -325,7 +325,7 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap.Objects
 
             if ( !projectBuilder.BuildProject( plugin.CombinePaths( pluginPath, plugin.ProjectFile ), VisualStudioInstall.GetDefaultInstall().GetMsBuild() ) )
             {
-                throw new Exception( "Install Plugin Failed" );
+                throw new Exception( "Build Plugin Failed" );
             }
 
             var pluginBuilder = new Builders.PluginBuilder( plugin, pluginPath );
