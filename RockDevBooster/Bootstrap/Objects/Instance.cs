@@ -136,6 +136,14 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap.Objects
             Views.InstancesView.UpdateInstances();
         }
 
+        /// <summary>
+        /// Stops all currently running instances.
+        /// </summary>
+        public static void StopAll()
+        {
+            Views.InstancesView.DefaultInstancesView.StopInstance();
+        }
+
         #endregion
 
         #region Protected Methods
