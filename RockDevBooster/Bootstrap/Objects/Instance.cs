@@ -155,23 +155,32 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap.Objects
         /// <returns></returns>
         protected List<Dictionary<string, object>> GetResultsFromCommand( System.Data.SqlClient.SqlCommand command )
         {
-            using ( var reader = command.ExecuteReader() )
+            try
             {
-                var results = new List<Dictionary<string, object>>();
-
-                while ( reader.Read() )
+                using ( var reader = command.ExecuteReader() )
                 {
-                    var row = new Dictionary<string, object>();
+                    var results = new List<Dictionary<string, object>>();
 
-                    for ( int i = 0; i < reader.FieldCount; i++ )
+                    while ( reader.Read() )
                     {
-                        row.Add( reader.GetName( i ), reader[i] );
+                        var row = new Dictionary<string, object>();
+
+                        for ( int i = 0; i < reader.FieldCount; i++ )
+                        {
+                            row.Add( reader.GetName( i ), reader[i] );
+                        }
+
+                        results.Add( row );
                     }
 
-                    results.Add( row );
+                    return results;
                 }
-
-                return results;
+            }
+            catch ( Exception e )
+            {
+                System.Diagnostics.Debugger.Launch();
+                System.Diagnostics.Debugger.Break();
+                throw e;
             }
         }
 
@@ -542,7 +551,15 @@ namespace com.blueboxmoon.RockDevBooster.Bootstrap.Objects
         public void Warmup()
         {
             var request = System.Net.WebRequest.CreateHttp( "http://localhost:6229/" );
+
+            request.Timeout = 600000; /* 10 minutes */
+
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             var response = ( System.Net.HttpWebResponse ) request.GetResponse();
+            sw.Stop();
+
+            var bootstrap = ( Bootstrapper ) ( ( Jint.Runtime.Interop.ObjectWrapper ) Engine.GetValue( "__Bootstrap" ).AsObject() ).Target;
+            bootstrap.Log( $"Warmup took ${ sw.ElapsedMilliseconds } ms" );
 
             if ( response.StatusCode != System.Net.HttpStatusCode.OK )
             {
