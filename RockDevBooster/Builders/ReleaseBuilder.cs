@@ -278,16 +278,19 @@ namespace com.blueboxmoon.RockDevBooster.Builders
                 //
                 foreach ( XmlNode node in doc.DocumentElement.SelectNodes( "//df:HintPath", mgr ) )
                 {
-                    string dllFile = Path.Combine( Path.GetDirectoryName( proj ), node.InnerText );
-                    string destFile = Path.Combine( destPath, Path.GetFileName( node.InnerText ) );
-
-                    //
-                    // If we found a DLL in the project directory that does not exist in the RockWeb directory
-                    // then copy it over.
-                    //
-                    if ( File.Exists( dllFile ) && !File.Exists( destFile ) )
+                    string libPath = Path.GetDirectoryName( Path.Combine( Path.GetDirectoryName( proj ), node.InnerText ) );
+                    foreach ( var dllFile in Directory.EnumerateFiles( libPath, "*.dll" ) )
                     {
-                        File.Copy( dllFile, Path.Combine( destPath, Path.GetFileName( node.InnerText ) ) );
+                        string destFile = Path.Combine( destPath, Path.GetFileName( dllFile ) );
+
+                        //
+                        // If we found a DLL in the project directory that does not exist in the RockWeb directory
+                        // then copy it over.
+                        //
+                        if ( File.Exists( dllFile ) && !File.Exists( destFile ) )
+                        {
+                            File.Copy( dllFile, destFile);
+                        }
                     }
                 }
             }
