@@ -418,12 +418,21 @@ namespace com.blueboxmoon.RockDevBooster.Views
                 return null;
             }
 
-            var connection = localDb.CreateConnection();
+            try
+            {
+                var connection = localDb.CreateConnection();
 
-            connection.Open();
-            connection.ChangeDatabase( RunningInstanceName );
+                connection.Open();
+                connection.ChangeDatabase( RunningInstanceName );
 
-            return connection;
+                return connection;
+            }
+            catch ( Exception e )
+            {
+                Debugger.Launch();
+                Debugger.Break();
+                throw e;
+            }
         }
 
         #endregion
