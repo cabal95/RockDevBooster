@@ -309,14 +309,35 @@ namespace com.blueboxmoon.RockDevBooster.Views
                         var client = new GitHubClient( new ProductHeaderValue( "RockDevBooster" ) );
                         client.SetRequestTimeout( TimeSpan.FromSeconds( 5 ) );
 
-                        var branches = ( await client.Repository.Branch.GetAll( "SparkDevNetwork", "Rock" ) )
-                           .Select( b => new GitHubItem( b ) )
-                           .OrderBy( b => b.DisplayName )
-                           .ToList();
+                        var branchList = new List<GitHubItem>();
 
-                        branches.Insert( 0, new GitHubItem() );
+                        var options = new ApiOptions
+                        {
+                            PageSize = 100,
+                            StartPage = 0
+                        };
 
-                        return branches;
+                        while ( true )
+                        {
+                            options.StartPage += 1;
+
+                            var branches = ( await client.Repository.Branch.GetAll( "SparkDevNetwork", "Rock", options ) )
+                               .Select( b => new GitHubItem( b ) )
+                               .ToList();
+
+                            branchList.AddRange( branches );
+
+                            if ( branches.Count() < options.PageSize )
+                            {
+                                break;
+                            }
+                        }
+
+                        branchList = branchList.OrderBy( b => b.DisplayName ).ToList();
+
+                        branchList.Insert( 0, new GitHubItem() );
+
+                        return branchList;
                     } );
                 }
 
